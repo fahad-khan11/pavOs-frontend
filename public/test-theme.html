@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme Sync Tester</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .dark {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+        .light {
+            background-color: #ffffff;
+            color: #000000;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .info {
+            background-color: rgba(0, 123, 255, 0.1);
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .log {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+        .dark .log {
+            background-color: #2a2a2a;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <h1>Whop Theme Sync Tester</h1>
+    <p>Use this page to test theme detection methods</p>
+    
+    <div class="info">
+        <strong>Current Theme:</strong> <span id="current-theme">Detecting...</span><br>
+        <strong>Detection Method:</strong> <span id="detection-method">-</span>
+    </div>
+
+    <h2>Test Controls</h2>
+    <button onclick="setDarkTheme()">Set Dark Theme (Add Class)</button>
+    <button onclick="setLightTheme()">Set Light Theme (Remove Class)</button>
+    <button onclick="testURLTheme()">Test URL Parameter</button>
+    <button onclick="testPostMessage()">Test PostMessage</button>
+    <button onclick="clearLogs()">Clear Logs</button>
+
+    <h2>Console Logs</h2>
+    <div id="logs" class="log"></div>
+
+    <script>
+        const logs = [];
+        const logElement = document.getElementById('logs');
+        const themeElement = document.getElementById('current-theme');
+        const methodElement = document.getElementById('detection-method');
+
+        function log(message, source = 'Manual') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logMessage = `[${timestamp}] ${message} (from ${source})`;
+            logs.push(logMessage);
+            logElement.innerHTML = logs.slice(-10).join('<br>');
+            console.log(logMessage);
+        }
+
+        function updateThemeDisplay() {
+            const isDark = document.documentElement.classList.contains('dark');
+            themeElement.textContent = isDark ? 'Dark' : 'Light';
+            document.body.className = isDark ? 'dark' : 'light';
+        }
+
+        function setDarkTheme() {
+            document.documentElement.classList.add('dark');
+            updateThemeDisplay();
+            methodElement.textContent = 'HTML Class';
+            log('Theme changed to dark', 'HTML Class');
+        }
+
+        function setLightTheme() {
+            document.documentElement.classList.remove('dark');
+            updateThemeDisplay();
+            methodElement.textContent = 'HTML Class';
+            log('Theme changed to light', 'HTML Class');
+        }
+
+        function testURLTheme() {
+            const url = new URL(window.location.href);
+            const currentTheme = url.searchParams.get('theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            url.searchParams.set('theme', newTheme);
+            window.location.href = url.toString();
+        }
+
+        function testPostMessage() {
+            window.postMessage({
+                type: 'theme-change',
+                theme: document.documentElement.classList.contains('dark') ? 'light' : 'dark'
+            }, '*');
+            log('PostMessage sent', 'PostMessage');
+        }
+
+        function clearLogs() {
+            logs.length = 0;
+            logElement.innerHTML = '';
+        }
+
+        // Watch for class changes
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                    updateThemeDisplay();
+                    const isDark = document.documentElement.classList.contains('dark');
+                    methodElement.textContent = 'MutationObserver';
+                    log(`Theme changed to ${isDark ? 'dark' : 'light'}`, 'MutationObserver');
+                }
+            });
+        });
+
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['class']
+        });
+
+        // Listen for postMessage
+        window.addEventListener('message', (event) => {
+            if (event.data.type === 'theme-change') {
+                const theme = event.data.theme;
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+                updateThemeDisplay();
+                methodElement.textContent = 'PostMessage';
+                log(`Theme changed to ${theme}`, 'PostMessage');
+            }
+        });
+
+        // Check URL parameter
+        const url = new URL(window.location.href);
+        const urlTheme = url.searchParams.get('theme');
+        if (urlTheme === 'dark' || urlTheme === 'light') {
+            if (urlTheme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+            updateThemeDisplay();
+            methodElement.textContent = 'URL Parameter';
+            log(`Theme set to ${urlTheme}`, 'URL Parameter');
+        }
+
+        // Initial display
+        updateThemeDisplay();
+        log('Theme tester initialized', 'System');
+    </script>
+</body>
+</html>
+
