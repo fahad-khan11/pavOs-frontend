@@ -344,7 +344,8 @@ export default function LeadDetailPage() {
   }
 
   return (
-    <div className="container mx-auto py-8 space-y-6 bg-white dark:bg-gray-950 min-h-screen">
+    <div className="bg-white dark:bg-gray-950 min-h-screen">
+      <div className="container mx-auto py-8 space-y-6">
       {/* Header */}
       <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -738,6 +739,7 @@ export default function LeadDetailPage() {
             )}
           </CardContent>
         </Card>
+      </div>
       </div>
     </div>
   )
