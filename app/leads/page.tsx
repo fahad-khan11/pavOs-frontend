@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { useAuth } from "@/components/auth-provider"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -33,7 +32,6 @@ type LeadSource = "discord" | "instagram" | "tiktok" | "whop" | "manual" | "refe
 
 interface Lead {
   id: string
-  userId: string
   name: string
   email?: string
   phone?: string
@@ -91,7 +89,6 @@ const sourceIcons: Record<LeadSource, string> = {
 
 export default function LeadsPage() {
   const router = useRouter()
-  const { user } = useAuth()
   const [leads, setLeads] = useState<Lead[]>([])
   const [stats, setStats] = useState<LeadStats | null>(null)
   const [loading, setLoading] = useState(true)
@@ -100,19 +97,15 @@ export default function LeadsPage() {
   const [sourceFilter, setSourceFilter] = useState<LeadSource | "all">("all")
 
   useEffect(() => {
-    if (user) {
-      loadLeads()
-      loadStats()
-    }
-  }, [user])
+    loadLeads()
+    loadStats()
+  }, [])
 
   const loadLeads = async () => {
     try {
       setLoading(true)
       const data = await discordService.getLeads()
-      // Filter leads to only show those belonging to the current user
-      const myLeads = (data.leads || []).filter((lead: Lead) => lead.userId === user?.id)
-      setLeads(myLeads)
+      setLeads(data.leads || [])
     } catch (error: any) {
       toast.error(error.message || "Failed to load leads")
     } finally {
