@@ -256,9 +256,9 @@ export default function LeadsPage() {
               <SelectContent className="bg-white dark:bg-[#101828]">
                 <SelectItem value="all">All Sources</SelectItem>
                 <SelectItem value="discord">Discord</SelectItem>
-                <SelectItem value="instagram">Instagram</SelectItem>
+                {/* <SelectItem value="instagram">Instagram</SelectItem>
                 <SelectItem value="tiktok">TikTok</SelectItem>
-                <SelectItem value="whop">Whop</SelectItem>
+                <SelectItem value="whop">Whop</SelectItem> */}
                 <SelectItem value="manual">Manual</SelectItem>
                 <SelectItem value="referral">Referral</SelectItem>
               </SelectContent>
