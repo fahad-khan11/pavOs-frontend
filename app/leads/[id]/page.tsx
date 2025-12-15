@@ -320,11 +320,13 @@ export default function LeadDetailPage() {
 
   if (loading) {
     return (
-      <div className="container mx-auto py-8 bg-white dark:bg-gray-950 min-h-screen">
-        <Skeleton className="h-8 w-64 mb-8" />
-        <div className="grid grid-cols-3 gap-8">
-          <Skeleton className="h-[600px] col-span-1" />
-          <Skeleton className="h-[600px] col-span-2" />
+      <div className="min-h-screen w-full bg-white dark:bg-gray-950">
+        <div className="container mx-auto py-8">
+          <Skeleton className="h-8 w-64 mb-8" />
+          <div className="grid grid-cols-3 gap-8">
+            <Skeleton className="h-[600px] col-span-1" />
+            <Skeleton className="h-[600px] col-span-2" />
+          </div>
         </div>
       </div>
     )
@@ -332,19 +334,21 @@ export default function LeadDetailPage() {
 
   if (!lead) {
     return (
-      <div className="container mx-auto py-8 bg-white dark:bg-gray-950 min-h-screen">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Lead not found</h2>
-          <Button onClick={() => router.push("/leads")} className="mt-4">
-            Back to Leads
-          </Button>
+      <div className="min-h-screen w-full bg-white dark:bg-gray-950">
+        <div className="container mx-auto py-8">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Lead not found</h2>
+            <Button onClick={() => router.push("/leads")} className="mt-4">
+              Back to Leads
+            </Button>
+          </div>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="bg-white dark:bg-gray-950 min-h-screen">
+    <div className="min-h-screen w-full bg-white dark:bg-gray-950">
       <div className="container mx-auto py-8 space-y-6">
       {/* Header */}
       <div className="space-y-4">

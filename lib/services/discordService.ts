@@ -86,6 +86,7 @@ class DiscordService {
    */
   async getOAuthURL(): Promise<string> {
     const response = await api.get('/integrations/discord/oauth-url');
+    // console.log('fahad debgging    ',response.data.data.url);
     return response.data.data.url;
   }
 
@@ -101,6 +102,7 @@ class DiscordService {
   }
 
   /**
+  
    * Disconnect Discord
    */
   async disconnect(): Promise<void> {
@@ -115,9 +117,7 @@ class DiscordService {
     return response.data.data;
   }
 
-  /**
-   * Get Discord messages
-   */
+  
   async getMessages(params?: {
     leadId?: string;
     channelId?: string;
@@ -194,6 +194,7 @@ class DiscordService {
     };
   }> {
     const response = await api.get('/leads', { params });
+    console.log('fahad debugging', response.data.data);
     return response.data.data;
   }
 

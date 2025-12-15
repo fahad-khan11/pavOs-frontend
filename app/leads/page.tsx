@@ -135,7 +135,7 @@ export default function LeadsPage() {
   })
 
   return (
-    <div className="bg-white dark:bg-gray-950 min-h-screen">
+    <div className="min-h-screen w-full bg-white dark:bg-gray-950">
       <div className="container mx-auto py-8 space-y-8">
         {/* Header */}
         <div className="space-y-4">
