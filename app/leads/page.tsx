@@ -292,7 +292,7 @@ export default function LeadsPage() {
                 </p>
               </div>
             ) : (
-              <div className="rounded-md border border-gray-200 dark:border-gray-800">
+              <div className="rounded-md border border-gray-200 dark:border-gray-800 overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>

@@ -329,7 +329,7 @@ export default function IntegrationsPage() {
             <CardContent className="space-y-4">
               {whopStatus?.connected ? (
                 <>
-                  <div className="grid grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="space-y-1">
                       <p className="text-sm text-gray-600 dark:text-gray-400">Company ID</p>
                       <p className="text-sm font-mono text-gray-900 dark:text-white">{whopStatus.companyId}</p>
@@ -453,7 +453,7 @@ export default function IntegrationsPage() {
             <CardContent className="space-y-4">
               {discordStatus?.connected ? (
                 <>
-                  <div className="grid grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="space-y-1">
                       <p className="text-sm text-gray-600 dark:text-gray-400">Server</p>
                       <p className="text-sm font-medium text-gray-900 dark:text-white">{discordStatus.guildName || 'N/A'}</p>
