@@ -294,7 +294,7 @@ export default function LeadDetailPage() {
     try {
       setSendingMessage(true)
       await discordService.sendMessage({
-        discordUserId: lead.discordUserId,
+        discordUserId: lead.discordUserId!,
         content: messageContent,
       })
 

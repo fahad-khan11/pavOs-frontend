@@ -138,14 +138,17 @@ class DiscordService {
   }
 
   /**
-   * Send Discord message
+   * Send Discord message (DM)
    */
   async sendMessage(data: {
-    channelId?: string;
-    discordUserId?: string;
+    discordUserId: string;
     content: string;
   }): Promise<any> {
-    const response = await api.post('/integrations/discord/send-message', data);
+    const payload = {
+      discordUserId: data.discordUserId,
+      content: data.content,
+    };
+    const response = await api.post('/integrations/discord/send-message', payload);
     return response.data.data;
   }
 
