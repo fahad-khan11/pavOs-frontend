@@ -38,6 +38,7 @@ export function WhopDashboardWrapper({
         )
 
         const { accessToken, refreshToken, user } = response.data.data
+        console.log("✅ Authenticated with PaveOS for user:", response.data.data)
 
         // Store tokens and user in localStorage with correct keys
         localStorage.setItem("auth_token", accessToken)
