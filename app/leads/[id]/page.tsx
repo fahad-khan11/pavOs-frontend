@@ -297,7 +297,7 @@ export default function LeadDetailPage() {
         discordUserId: lead.discordUserId!,
         content: messageContent,
       })
-
+      //helo
       setMessageContent("")
       toast.success("Message sent!")
     } catch (error: any) {
