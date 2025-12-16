@@ -86,7 +86,7 @@ export default function NewLeadPage() {
       const newLead = await discordService.createLead(leadData)
       
       toast.success("Lead created successfully!")
-      router.push(`/leads/${newLead.id}`)
+      router.push("/leads")
     } catch (error: any) {
       console.error("Error creating lead:", error)
       toast.error(error.message || "Failed to create lead")
@@ -208,7 +208,7 @@ export default function NewLeadPage() {
                       </SelectTrigger>
                       <SelectContent className="bg-white dark:bg-gray-900">
                         <SelectItem value="manual">Manual</SelectItem>
-                        <SelectItem value="discord">Discord</SelectItem>
+                        {/* <SelectItem value="discord">Discord</SelectItem> */}
                         {/* <SelectItem value="instagram">Instagram</SelectItem> */}
                         {/* <SelectItem value="tiktok">TikTok</SelectItem> */}
                         {/* <SelectItem value="whop">Whop</SelectItem> */}

@@ -260,7 +260,7 @@ export default function LeadsPage() {
                 <SelectItem value="tiktok">TikTok</SelectItem>
                 <SelectItem value="whop">Whop</SelectItem> */}
                 <SelectItem value="manual">Manual</SelectItem>
-                <SelectItem value="referral">Referral</SelectItem>
+                {/* <SelectItem value="referral">Referral</SelectItem> */}
               </SelectContent>
             </Select>
           </CardContent>
@@ -364,16 +364,18 @@ export default function LeadsPage() {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              router.push(`/leads/${lead.id}`)
-                            }}
-                          >
-                            <MessageSquare className="h-4 w-4" />
-                          </Button>
+                          {lead.source !== "manual" && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                router.push(`/leads/${lead.id}`)
+                              }}
+                            >
+                              <MessageSquare className="h-4 w-4" />
+                            </Button>
+                          )}
                         </TableCell>
                       </TableRow>
                     ))}
