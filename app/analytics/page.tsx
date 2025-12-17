@@ -198,10 +198,10 @@ export default function AnalyticsPage() {
             <p className="text-gray-600 dark:text-gray-400 mt-1">Track your performance and insights</p>
           </div>
           <Select value={timeRange} onValueChange={setTimeRange}>
-            <SelectTrigger className="w-40 dark:bg-white dark:text-gray-900">
+            <SelectTrigger className="w-40 dark:bg-gray-950 dark:text-white">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="bg-white dark:bg-white dark:text-gray-900">
+            <SelectContent className="bg-white dark:bg-gray-950 dark:text-white">
               <SelectItem value="7">Last 7 days</SelectItem>
               <SelectItem value="30">Last 30 days</SelectItem>
               <SelectItem value="90">Last 90 days</SelectItem>

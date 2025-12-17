@@ -14,7 +14,7 @@ interface DashboardStats {
   avgDealSize: number
   totalLeads: number
   wonLeads: number
-  lostLeads: number
+  lostLeads: numberema
 }
 
 interface Activity {

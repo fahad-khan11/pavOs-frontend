@@ -135,7 +135,7 @@ export default function LeadsPage() {
   })
 
   return (
-    <div className="bg-white dark:bg-gray-950 min-h-screen">
+    <div className="min-h-screen w-full bg-white dark:bg-gray-950">
       <div className="container mx-auto py-8 space-y-8">
         {/* Header */}
         <div className="space-y-4">
@@ -256,11 +256,11 @@ export default function LeadsPage() {
               <SelectContent className="bg-white dark:bg-[#101828]">
                 <SelectItem value="all">All Sources</SelectItem>
                 <SelectItem value="discord">Discord</SelectItem>
-                <SelectItem value="instagram">Instagram</SelectItem>
+                {/* <SelectItem value="instagram">Instagram</SelectItem>
                 <SelectItem value="tiktok">TikTok</SelectItem>
-                <SelectItem value="whop">Whop</SelectItem>
+                <SelectItem value="whop">Whop</SelectItem> */}
                 <SelectItem value="manual">Manual</SelectItem>
-                <SelectItem value="referral">Referral</SelectItem>
+                {/* <SelectItem value="referral">Referral</SelectItem> */}
               </SelectContent>
             </Select>
           </CardContent>
@@ -292,7 +292,7 @@ export default function LeadsPage() {
                 </p>
               </div>
             ) : (
-              <div className="rounded-md border border-gray-200 dark:border-gray-800">
+              <div className="rounded-md border border-gray-200 dark:border-gray-800 overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -364,16 +364,18 @@ export default function LeadsPage() {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              router.push(`/leads/${lead.id}`)
-                            }}
-                          >
-                            <MessageSquare className="h-4 w-4" />
-                          </Button>
+                          {lead.source !== "manual" && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                router.push(`/leads/${lead.id}`)
+                              }}
+                            >
+                              <MessageSquare className="h-4 w-4" />
+                            </Button>
+                          )}
                         </TableCell>
                       </TableRow>
                     ))}
