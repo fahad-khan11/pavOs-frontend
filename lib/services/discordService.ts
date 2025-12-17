@@ -44,6 +44,25 @@ export interface DiscordMessage {
   updatedAt: string;
 }
 
+// ✅ NEW: Discord Lead Channel interface
+export interface DiscordLeadChannel {
+  id: string;
+  userId: string;
+  whopCompanyId: string;
+  leadId: string;
+  discordGuildId: string;
+  discordChannelId: string;
+  discordChannelName: string;
+  discordUserId?: string;
+  discordUsername?: string;
+  channelCreatedAt: string;
+  lastMessageAt?: string;
+  messageCount: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Lead {
   id: string;
   userId: string;
@@ -53,6 +72,9 @@ export interface Lead {
   phone?: string;
   discordUserId?: string;
   discordUsername?: string;
+  discordChannelId?: string;        // ✅ NEW: Dedicated Discord channel for this lead
+  discordInviteSent?: boolean;      // ✅ NEW: Whether invite was sent to lead
+  discordJoinedChannel?: boolean;   // ✅ NEW: Whether lead joined their channel
   instagramUsername?: string;
   tiktokUsername?: string;
   source: 'discord' | 'instagram' | 'tiktok' | 'whop' | 'manual' | 'referral';
@@ -86,7 +108,6 @@ class DiscordService {
    */
   async getOAuthURL(): Promise<string> {
     const response = await api.get('/integrations/discord/oauth-url');
-    // console.log('fahad debgging    ',response.data.data.url);
     return response.data.data.url;
   }
 
@@ -102,7 +123,6 @@ class DiscordService {
   }
 
   /**
-  
    * Disconnect Discord
    */
   async disconnect(): Promise<void> {
@@ -117,7 +137,9 @@ class DiscordService {
     return response.data.data;
   }
 
-  
+  /**
+   * Get Discord messages
+   */
   async getMessages(params?: {
     leadId?: string;
     channelId?: string;
@@ -138,17 +160,23 @@ class DiscordService {
   }
 
   /**
-   * Send Discord message (DM)
+   * Send Discord message
+   * 
+   * ✅ UPDATED: Now supports both channel-based (leadId) and DM-based (discordUserId) sending
+   * - Use leadId (recommended): Channel-based routing with deterministic ownership
+   * - Use discordUserId (legacy): DM-based routing for backward compatibility
    */
   async sendMessage(data: {
-    discordUserId: string;
+    channelId?: string;
+    leadId?: string;           // ✅ NEW: Recommended - Send via lead's dedicated channel
+    discordUserId?: string;    // ⚠️ LEGACY: Still supported for backward compatibility
     content: string;
-  }): Promise<any> {
-    const payload = {
-      discordUserId: data.discordUserId,
-      content: data.content,
-    };
-    const response = await api.post('/integrations/discord/send-message', payload);
+  }): Promise<{
+    message?: any;
+    messageId?: string;
+    method: 'channel' | 'dm';  // ✅ NEW: Indicates which routing method was used
+  }> {
+    const response = await api.post('/integrations/discord/send-message', data);
     return response.data.data;
   }
 
@@ -173,7 +201,59 @@ class DiscordService {
     await api.post('/integrations/discord/stop-bot');
   }
 
-  // Lead Management Methods
+  // ========================================
+  // ✅ NEW: CHANNEL MANAGEMENT METHODS
+  // ========================================
+
+  /**
+   * Create a dedicated Discord channel for a lead
+   * 
+   * This creates a private channel in the company's Discord server
+   * where the CRM user can communicate with the lead.
+   */
+  async createChannel(leadId: string): Promise<DiscordLeadChannel> {
+    const response = await api.post('/integrations/discord/channels', { leadId });
+    return response.data.data.channel;
+  }
+
+  /**
+   * Get channel details for a specific lead
+   * 
+   * Returns null if no channel exists for this lead yet.
+   */
+  async getChannelForLead(leadId: string): Promise<DiscordLeadChannel | null> {
+    const response = await api.get(`/integrations/discord/channels/${leadId}`);
+    return response.data.data.channel;
+  }
+
+  /**
+   * Get all Discord channels for the user's company
+   * 
+   * Returns a list of all active lead channels in the company.
+   */
+  async getCompanyChannels(): Promise<{
+    channels: DiscordLeadChannel[];
+    count: number;
+  }> {
+    const response = await api.get('/integrations/discord/channels');
+    return response.data.data;
+  }
+
+  /**
+   * Archive a Discord channel
+   * 
+   * Marks the channel as inactive. The channel remains in Discord
+   * but is no longer actively managed by the CRM.
+   */
+  async archiveChannel(leadId: string, reason?: string): Promise<void> {
+    await api.delete(`/integrations/discord/channels/${leadId}`, {
+      data: { reason },
+    });
+  }
+
+  // ========================================
+  // LEAD MANAGEMENT METHODS
+  // ========================================
 
   /**
    * Get all leads
@@ -197,7 +277,6 @@ class DiscordService {
     };
   }> {
     const response = await api.get('/leads', { params });
-    console.log('fahad debugging', response.data.data);
     return response.data.data;
   }
 

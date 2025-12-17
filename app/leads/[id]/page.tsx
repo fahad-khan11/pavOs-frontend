@@ -286,21 +286,49 @@ export default function LeadDetailPage() {
   }
 
   const handleSendMessage = async () => {
-    if (!messageContent.trim() || !lead?.discordUserId) {
+    if (!messageContent.trim()) {
       toast.error("Please enter a message")
       return
     }
 
     try {
       setSendingMessage(true)
-      await discordService.sendMessage({
-        discordUserId: lead.discordUserId!,
+      
+      // ✅ OPTIMISTIC UPDATE: Add message to UI immediately
+      const tempMessage: Message = {
+        id: `temp-${Date.now()}`, // Temporary ID until we get real one from server
+        content: messageContent,
+        direction: "outgoing",
+        authorUsername: "You",
+        isRead: true,
+        createdAt: new Date().toISOString(),
+      }
+      
+      setMessages((prev) => [...prev, tempMessage])
+      setMessageContent("") // Clear input immediately for better UX
+      
+      // Send to server
+      // ✅ FIXED: Use leadId for channel-based routing instead of discordUserId (DM routing)
+      const response = await discordService.sendMessage({
+        leadId: leadId,  // ✅ Channel-based routing (deterministic)
         content: messageContent,
       })
-      //helo
-      setMessageContent("")
+
+      // ✅ UPDATE: Replace temp message with real one from server (if response includes message ID)
+      if (response?.messageId) {
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === tempMessage.id ? { ...m, id: response.messageId! } : m
+          )
+        )
+      }
+
       toast.success("Message sent!")
+      scrollToBottom()
     } catch (error: any) {
+      // ✅ ROLLBACK: Remove optimistic message on error
+      setMessages((prev) => prev.filter((m) => !m.id.startsWith('temp-')))
+      setMessageContent(messageContent) // Restore message content on error
       toast.error(error.message || "Failed to send message")
     } finally {
       setSendingMessage(false)
@@ -320,13 +348,11 @@ export default function LeadDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen w-full bg-white dark:bg-gray-950">
-        <div className="container mx-auto py-8">
-          <Skeleton className="h-8 w-64 mb-8" />
-          <div className="grid grid-cols-3 gap-8">
-            <Skeleton className="h-[600px] col-span-1" />
-            <Skeleton className="h-[600px] col-span-2" />
-          </div>
+      <div className="container mx-auto py-8 bg-white dark:bg-gray-950 min-h-screen">
+        <Skeleton className="h-8 w-64 mb-8" />
+        <div className="grid grid-cols-3 gap-8">
+          <Skeleton className="h-[600px] col-span-1" />
+          <Skeleton className="h-[600px] col-span-2" />
         </div>
       </div>
     )
@@ -334,21 +360,19 @@ export default function LeadDetailPage() {
 
   if (!lead) {
     return (
-      <div className="min-h-screen w-full bg-white dark:bg-gray-950">
-        <div className="container mx-auto py-8">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Lead not found</h2>
-            <Button onClick={() => router.push("/leads")} className="mt-4">
-              Back to Leads
-            </Button>
-          </div>
+      <div className="container mx-auto py-8 bg-white dark:bg-gray-950 min-h-screen">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Lead not found</h2>
+          <Button onClick={() => router.push("/leads")} className="mt-4">
+            Back to Leads
+          </Button>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen w-full bg-white dark:bg-gray-950">
+    <div className="bg-white dark:bg-gray-950 min-h-screen">
       <div className="container mx-auto py-8 space-y-6">
       {/* Header */}
       <div className="space-y-4">
@@ -625,9 +649,8 @@ export default function LeadDetailPage() {
                   Conversation History
                 </CardTitle>
                 <CardDescription className="flex items-center gap-2 mt-1">
-                  {lead.discordUserId
-                    ? "Send and receive Discord messages"
-                    : "No messaging platform connected"}
+                  {/* ✅ FIXED: Updated message for channel-based routing */}
+                  Send and receive Discord messages
                   {/* Socket Status Indicator */}
                   <span className="flex items-center gap-1 text-xs ml-2">
                     <span className={`h-2 w-2 rounded-full ${isConnected ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`} />
@@ -660,9 +683,8 @@ export default function LeadDetailPage() {
                   <MessageSquare className="h-12 w-12 text-gray-600 dark:text-gray-400 mb-4" />
                   <h3 className="text-lg font-semibold mb-2">No messages yet</h3>
                   <p className="text-gray-600 dark:text-gray-400 text-center max-w-md">
-                    {lead.discordUserId
-                      ? "Start a conversation by sending a message below"
-                      : "Connect a messaging platform to start chatting"}
+                    {/* ✅ FIXED: Updated message for channel-based routing */}
+                    Start a conversation by sending a message below
                   </p>
                 </div>
               ) : (
@@ -712,7 +734,8 @@ export default function LeadDetailPage() {
             </div>
 
             {/* Message Input */}
-            {lead.discordUserId && (
+            {/* ✅ FIXED: Show message input for all leads (channel-based routing doesn't require discordUserId) */}
+            {lead && (
               <div className="border-t border-gray-200 dark:border-gray-800 p-4 flex-shrink-0 bg-white dark:bg-gray-900">
                 <div className="flex gap-2">
                   <Textarea
