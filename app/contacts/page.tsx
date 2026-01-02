@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/components/auth-provider"
-import { Navbar } from "@/components/navbar"
+
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -31,6 +31,14 @@ import { EmailComposer, type EmailData } from "@/components/email-composer"
 import type { Contact } from "@/lib/types"
 import { contactService } from "@/lib/services"
 import toast from "react-hot-toast"
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
 
 export default function ContactsPage() {
   const { user, isLoading: authLoading } = useAuth()
@@ -134,7 +142,7 @@ export default function ContactsPage() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-white dark:bg-gray-950 flex items-center justify-center">
+      <div className="flex h-[calc(100vh-4rem)] items-center justify-center bg-white dark:bg-gray-950">
         <Loader2 className="h-8 w-8 animate-spin text-gray-900 dark:text-white" />
       </div>
     )
@@ -146,29 +154,42 @@ export default function ContactsPage() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950">
-      <Navbar />
+
       <main className="container mx-auto py-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">Contacts</h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">Manage your brand contacts and relationships</p>
+        <div className="mb-8 space-y-4">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>Contacts</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">Contacts</h1>
+              <p className="text-gray-600 dark:text-gray-400 mt-1">Manage your brand contacts and relationships</p>
+            </div>
+            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="dark:hover:bg-[#030712]">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Contact
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800">
+                <DialogHeader>
+                  <DialogTitle className="text-gray-900 dark:text-white">Add New Contact</DialogTitle>
+                  <DialogDescription className="text-gray-600 dark:text-gray-400">Add a new brand contact to your CRM.</DialogDescription>
+                </DialogHeader>
+                <ContactForm onSubmit={handleAddContact} onCancel={() => setIsAddDialogOpen(false)} />
+              </DialogContent>
+            </Dialog>
           </div>
-          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-            <DialogTrigger asChild>
-              <Button variant="outline" className="dark:hover:bg-[#030712]">
-                <Plus className="mr-2 h-4 w-4" />
-                Add Contact
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800">
-              <DialogHeader>
-                <DialogTitle className="text-gray-900 dark:text-white">Add New Contact</DialogTitle>
-                <DialogDescription className="text-gray-600 dark:text-gray-400">Add a new brand contact to your CRM.</DialogDescription>
-              </DialogHeader>
-              <ContactForm onSubmit={handleAddContact} onCancel={() => setIsAddDialogOpen(false)} />
-            </DialogContent>
-          </Dialog>
         </div>
 
         {/* Search and Filters */}
@@ -320,7 +341,7 @@ export default function ContactsPage() {
                 <DialogDescription>Compose and send an email to {emailContact.email}</DialogDescription>
               </DialogHeader>
               <EmailComposer
-                recipient={emailContact.email}
+                to={emailContact.email}
                 onSend={handleSendEmail}
                 onCancel={() => setEmailContact(null)}
               />

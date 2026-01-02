@@ -34,7 +34,7 @@ export function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
-    <nav className="border-b bg-[#0e1d3a] dark:bg-[#0e1d3a] border-gray-200 dark:border-gray-800">
+    <nav className="border-b bg-white dark:bg-[#101828] shadow-md dark:shadow-none border-gray-200 dark:border-gray-800 relative z-10">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center gap-8">
@@ -43,7 +43,7 @@ export function Navbar() {
               <div className="md:hidden">
                 <Sheet open={isOpen} onOpenChange={setIsOpen}>
                   <SheetTrigger asChild>
-                    <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
+                    <Button variant="ghost" size="icon" className="text-gray-900 hover:bg-gray-100">
                       <Menu className="h-6 w-6" />
                     </Button>
                   </SheetTrigger>
@@ -90,7 +90,7 @@ export function Navbar() {
                 </Sheet>
               </div>
 
-              <Link href="/dashboard" className="flex items-center gap-2 group">
+              <Link href="/dashboard" className="flex items-center gap-2 group md:hidden">
                 <div className="h-9 w-9 rounded-lg overflow-hidden transition-transform group-hover:scale-105">
                   <Image
                     src="/paveOs-logo.jpg"
@@ -100,55 +100,37 @@ export function Navbar() {
                     className="object-cover"
                   />
                 </div>
-                <span className="font-bold text-lg text-white dark:text-white hidden sm:block">PaveOS</span>
+                <span className="font-bold text-lg text-gray-900 dark:text-gray-900 hidden sm:block">PaveOS</span>
               </Link>
-            </div>
-
-            <div className="hidden md:flex items-center gap-1">
-              {navigation.map((item) => {
-                const Icon = item.icon
-                const isActive = pathname === item.href
-                return (
-                  <Link key={item.name} href={item.href}>
-                    <Button
-                      variant="ghost"
-                      className={cn(
-                        "gap-2 text-white/70 dark:text-white/70 hover:text-white dark:hover:text-white hover:bg-white/10 dark:hover:bg-white/10",
-                        isActive && "bg-white dark:bg-white text-[#0e1d3a] dark:text-[#0e1d3a] hover:bg-white dark:hover:bg-white hover:text-[#0e1d3a] dark:hover:text-[#0e1d3a]",
-                      )}
-                    >
-                      <Icon className="h-4 w-4" />
-                      {item.name}
-                    </Button>
-                  </Link>
-                )
-              })}
             </div>
           </div>
 
           <div className="flex items-center gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="gap-2 text-white dark:text-white hover:bg-white/10 dark:hover:bg-white/10 px-2 sm:px-4">
-                  <div className="h-8 w-8 rounded-full bg-white dark:bg-white flex items-center justify-center">
+                <Button variant="ghost" className="gap-2 text-gray-900 hover:bg-gray-100 px-2 sm:px-4">
+                  <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center">
                     <span className="text-sm font-semibold text-[#0e1d3a] dark:text-[#0e1d3a]">
                       {user?.name?.charAt(0).toUpperCase()}
                     </span>
                   </div>
-                  <span className="hidden sm:inline text-white dark:text-white">{user?.name}</span>
+                  <span className="hidden sm:inline text-gray-900 dark:text-white">{user?.name}</span>
                 </Button>
               </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800">
+            <DropdownMenuContent align="end" className="w-56 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 shadow-lg">
               <DropdownMenuLabel className="text-gray-900 dark:text-white">My Account</DropdownMenuLabel>
               <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-800" />
-              <DropdownMenuItem className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800">
+              <DropdownMenuItem 
+                onClick={() => router.push('/settings/profile')} 
+                className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
+              >
                 <User className="mr-2 h-4 w-4" />
                 Profile
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/settings/integrations')} className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800">
+              {/* <DropdownMenuItem onClick={() => router.push('/settings/integrations')} className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800">
                 <Settings className="mr-2 h-4 w-4" />
                 Integrations
-              </DropdownMenuItem>
+              </DropdownMenuItem> */}
             </DropdownMenuContent>
           </DropdownMenu>
           </div>

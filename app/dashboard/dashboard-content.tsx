@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Navbar } from "@/components/navbar"
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { DollarSign, TrendingUp, Users, Briefcase, Loader2 } from "lucide-react"
 import api from "@/lib/api"
@@ -109,18 +109,15 @@ export default function DashboardContent({ whopCompanyId }: DashboardContentProp
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white dark:bg-gray-950">
-        <Navbar />
-        <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 flex items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-gray-900 dark:text-white" />
-        </main>
+      <div className="flex h-[calc(100vh-4rem)] items-center justify-center bg-white dark:bg-gray-950">
+        <Loader2 className="h-8 w-8 animate-spin text-gray-900 dark:text-white" />
       </div>
     )
   }
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950">
-      <Navbar />
+
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-balance text-gray-900 dark:text-white">Welcome back, {user?.name || 'Creator'}</h1>

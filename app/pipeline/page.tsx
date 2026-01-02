@@ -6,7 +6,7 @@ import toast from "react-hot-toast"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/components/auth-provider"
-import { Navbar } from "@/components/navbar"
+
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -21,6 +21,14 @@ import {
 import { Plus, DollarSign, Calendar, MessageSquare, User, Loader2 } from "lucide-react"
 import { discordService } from "@/lib/services/discordService"
 import { format } from "date-fns"
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
 
 type LeadStatus = "new" | "in_conversation" | "proposal" | "negotiation" | "won" | "lost"
 
@@ -88,7 +96,7 @@ export default function PipelinePage() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-950">
+      <div className="flex h-[calc(100vh-4rem)] items-center justify-center bg-white dark:bg-gray-950">
         <Loader2 className="h-8 w-8 animate-spin text-gray-900 dark:text-white" />
       </div>
     )
@@ -146,17 +154,31 @@ export default function PipelinePage() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950">
-      <Navbar />
+
+
       <main className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-3xl font-bold text-balance text-gray-900 dark:text-white">Pipeline</h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">Manage your leads through the sales pipeline</p>
+        <div className="mb-6 space-y-4">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>Pipeline</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-balance text-gray-900 dark:text-white">Pipeline</h1>
+              <p className="text-gray-600 dark:text-gray-400 mt-1">Manage your leads through the sales pipeline</p>
+            </div>
+            <Button variant="outline" className="gap-2" onClick={() => router.push("/leads/new")}>
+              <Plus className="h-4 w-4" />
+              Add Lead
+            </Button>
           </div>
-          <Button variant="outline" className="gap-2" onClick={() => router.push("/leads/new")}>
-            <Plus className="h-4 w-4" />
-            Add Lead
-          </Button>
         </div>
 
         {/* Pipeline Metrics */}

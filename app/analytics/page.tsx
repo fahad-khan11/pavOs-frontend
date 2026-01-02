@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/components/auth-provider"
 import { useTheme } from "next-themes"
-import { Navbar } from "@/components/navbar"
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -26,6 +26,14 @@ import {
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import api from "@/lib/api"
 import toast from "react-hot-toast"
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
 
 // Custom tick component for proper dark mode support
 const CustomTick = ({ x, y, payload, isDark }: any) => {
@@ -109,7 +117,7 @@ export default function AnalyticsPage() {
 
   if (isLoading || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-950">
+      <div className="flex h-[calc(100vh-4rem)] items-center justify-center bg-white dark:bg-gray-950">
         <Loader2 className="h-8 w-8 animate-spin text-gray-900 dark:text-white" />
       </div>
     )
@@ -117,8 +125,8 @@ export default function AnalyticsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white dark:bg-gray-950">
-        <Navbar />
+      <div className="flex h-[calc(100vh-4rem)] items-center justify-center bg-white dark:bg-gray-950">
+
         <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-gray-900 dark:text-white" />
@@ -190,24 +198,37 @@ export default function AnalyticsPage() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950">
-      <Navbar />
+
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-balance">Analytics</h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">Track your performance and insights</p>
+        <div className="mb-8 space-y-4">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>Analytics</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-balance text-gray-900 dark:text-white">Analytics</h1>
+              <p className="text-gray-600 dark:text-gray-400 mt-1">Track your performance and insights</p>
+            </div>
+            <Select value={timeRange} onValueChange={setTimeRange}>
+              <SelectTrigger className="w-40 dark:bg-gray-950 dark:text-white">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-white dark:bg-gray-950 dark:text-white">
+                <SelectItem value="7">Last 7 days</SelectItem>
+                <SelectItem value="30">Last 30 days</SelectItem>
+                <SelectItem value="90">Last 90 days</SelectItem>
+                <SelectItem value="365">Last year</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-          <Select value={timeRange} onValueChange={setTimeRange}>
-            <SelectTrigger className="w-40 dark:bg-gray-950 dark:text-white">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="bg-white dark:bg-gray-950 dark:text-white">
-              <SelectItem value="7">Last 7 days</SelectItem>
-              <SelectItem value="30">Last 30 days</SelectItem>
-              <SelectItem value="90">Last 90 days</SelectItem>
-              <SelectItem value="365">Last year</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">

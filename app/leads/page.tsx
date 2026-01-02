@@ -87,6 +87,15 @@ const sourceIcons: Record<LeadSource, string> = {
   referral: "🤝",
 }
 
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
+
 export default function LeadsPage() {
   const router = useRouter()
   const [leads, setLeads] = useState<Lead[]>([])
@@ -135,45 +144,48 @@ export default function LeadsPage() {
   })
 
   return (
-    <div className="min-h-screen w-full bg-white dark:bg-gray-950">
+    <div className="min-h-screen w-full bg-white dark:bg-gray-950 p-8">
       <div className="container mx-auto py-8 space-y-8">
         {/* Header */}
         <div className="space-y-4">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>Leads</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
           <div className="flex items-center justify-between">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => router.push("/dashboard")}
-              className="shrink-0"
-            >
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Leads</h1>
+              <p className="text-gray-600 dark:text-gray-400 mt-1">
+                Manage your leads from Discord .
+              </p>
+            </div>
             <Button onClick={() => router.push("/leads/new")} variant="outline">
               <UserPlus className="h-4 w-4 mr-2" />
               Add Lead
             </Button>
           </div>
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Leads</h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">
-              Manage your leads from Discord .
-            </p>
-          </div>
         </div>
 
         {/* Stats Cards */}
         {stats && (
-          <div className="grid gap-4 md:grid-cols-6">
+          <div className="grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
             <Card>
               <CardHeader className="pb-2">
-                <CardDescription>Total Leads</CardDescription>
+                <CardDescription className="truncate">Total Leads</CardDescription>
                 <CardTitle className="text-2xl">{stats.total}</CardTitle>
               </CardHeader>
             </Card>
             <Card>
               <CardHeader className="pb-2">
-                <CardDescription>New</CardDescription>
-                <CardTitle className="text-2xl flex items-center gap-2">
+                <CardDescription className="truncate">New</CardDescription>
+                <CardTitle className="text-2xl flex items-center justify-between">
                   {stats.new}
                   <Badge className={statusColors.new}>New</Badge>
                 </CardTitle>
@@ -181,8 +193,8 @@ export default function LeadsPage() {
             </Card>
             <Card>
               <CardHeader className="pb-2">
-                <CardDescription>In Conversation</CardDescription>
-                <CardTitle className="text-2xl flex items-center gap-2">
+                <CardDescription className="truncate" title="In Conversation">In Conversation</CardDescription>
+                <CardTitle className="text-2xl flex items-center justify-between">
                   {stats.in_conversation}
                   <Badge className={statusColors.in_conversation}>Active</Badge>
                 </CardTitle>
@@ -190,8 +202,8 @@ export default function LeadsPage() {
             </Card>
             <Card>
               <CardHeader className="pb-2">
-                <CardDescription>Proposal</CardDescription>
-                <CardTitle className="text-2xl flex items-center gap-2">
+                <CardDescription className="truncate">Proposal</CardDescription>
+                <CardTitle className="text-2xl flex items-center justify-between">
                   {stats.proposal}
                   <Badge className={statusColors.proposal}>Proposal</Badge>
                 </CardTitle>
@@ -199,8 +211,8 @@ export default function LeadsPage() {
             </Card>
             <Card>
               <CardHeader className="pb-2">
-                <CardDescription>Won</CardDescription>
-                <CardTitle className="text-2xl flex items-center gap-2">
+                <CardDescription className="truncate">Won</CardDescription>
+                <CardTitle className="text-2xl flex items-center justify-between">
                   {stats.won}
                   <Badge className={statusColors.won}>Won</Badge>
                 </CardTitle>
@@ -208,7 +220,7 @@ export default function LeadsPage() {
             </Card>
             <Card>
               <CardHeader className="pb-2">
-                <CardDescription>Lost</CardDescription>
+                <CardDescription className="truncate">Lost</CardDescription>
                 <CardTitle className="text-2xl">{stats.lost}</CardTitle>
               </CardHeader>
             </Card>

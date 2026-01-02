@@ -16,6 +16,14 @@ import {
 import { discordService } from "@/lib/services/discordService"
 import { ArrowLeft, UserPlus, Save } from "lucide-react"
 import toast from "react-hot-toast"
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
 
 type LeadSource = "discord" | "instagram" | "tiktok" | "whop" | "manual" | "referral"
 type LeadStatus = "new" | "in_conversation" | "proposal" | "negotiation" | "won" | "lost"
@@ -100,18 +108,26 @@ export default function NewLeadPage() {
   }
 
   return (
-    <div className="bg-white dark:bg-gray-950 min-h-screen">
+    <div className="bg-white dark:bg-gray-950 min-h-screen p-8">
       <div className="container mx-auto py-8 space-y-6">
+
         {/* Header */}
-        <div className="flex items-center gap-4">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => router.back()}
-            className="shrink-0"
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
+        <div className="space-y-4">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/leads">Leads</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>Add New Lead</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
           <div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Add New Lead</h1>
             <p className="text-gray-600 dark:text-gray-400 mt-1">

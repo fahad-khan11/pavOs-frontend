@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/components/auth-provider"
-import { Navbar } from "@/components/navbar"
+
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -11,6 +11,14 @@ import { Loader2, CheckCircle, XCircle, RefreshCw, ExternalLink, MessageCircle }
 import { whopService, type WhopConnectionStatus } from "@/lib/services"
 import { discordService, type DiscordConnectionStatus } from "@/lib/services/discordService"
 import toast from "react-hot-toast"
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
 
 export default function IntegrationsPage() {
   const { user, isLoading: authLoading } = useAuth()
@@ -265,8 +273,8 @@ export default function IntegrationsPage() {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-white" />
+      <div className="flex h-[calc(100vh-4rem)] items-center justify-center bg-white dark:bg-gray-950">
+        <Loader2 className="h-8 w-8 animate-spin text-gray-900 dark:text-white" />
       </div>
     )
   }
@@ -277,11 +285,24 @@ export default function IntegrationsPage() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950">
-      <Navbar />
+
       <main className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Integrations</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">Connect your tools and sync your data</p>
+        <div className="mb-6 space-y-4">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>Integrations</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Integrations</h1>
+            <p className="text-gray-600 dark:text-gray-400 mt-1">Connect your tools and sync your data</p>
+          </div>
         </div>
 
         <div className="space-y-6">

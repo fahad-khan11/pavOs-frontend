@@ -9,6 +9,8 @@ import { WhopThemeSync } from "@/components/whop-theme-sync"
 import { WhopThemeWrapper } from "@/components/whop-theme-wrapper"
 import { Toaster } from "react-hot-toast"
 import { WhopApp } from "@whop/react/components"
+import { Sidebar } from "@/components/sidebar"
+import { Navbar } from "@/components/navbar"
 
 
 const inter = Inter({ subsets: ["latin"] })
@@ -37,7 +39,17 @@ export default function RootLayout({
           <WhopThemeSync />
           <WhopApp accentColor="blue" appearance="inherit">
             <WhopThemeWrapper>
-              <AuthProvider>{children}</AuthProvider>
+              <AuthProvider>
+                <div className="flex h-screen overflow-hidden">
+                  <div className="hidden md:block">
+                    <Sidebar />
+                  </div>
+                  <main className="flex-1 overflow-auto">
+                    <Navbar />
+                    {children}
+                  </main>
+                </div>
+              </AuthProvider>
             </WhopThemeWrapper>
           </WhopApp>
           <Toaster

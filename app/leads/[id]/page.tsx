@@ -35,6 +35,14 @@ import {
 } from "lucide-react"
 import toast from "react-hot-toast"
 import { format } from "date-fns"
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
 
 type LeadStatus = "new" | "in_conversation" | "proposal" | "negotiation" | "won" | "lost"
 
@@ -376,15 +384,27 @@ export default function LeadDetailPage() {
   }
 
   return (
-    <div className="mx-auto w-full bg-white dark:bg-gray-950 min-h-screen">
+    <div className="mx-auto w-full bg-white dark:bg-gray-950 min-h-screen p-8">
       <div className="container mx-auto py-8 space-y-6">
       {/* Header */}
       <div className="space-y-4">
-      <div className="flex items-center justify-between">
-          <Button variant="ghost" size="sm" onClick={() => router.push("/leads")}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Leads
-          </Button>
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/leads">Leads</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>{lead.name}</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+        <div className="flex items-center justify-between">
+          <div /> {/* Placeholder to keep alignment if needed, or just remove flex justify-between if not needed. But wait, Badge is also there. */}
           <Badge className={statusColors[lead.status]}>
             {lead.status.replace("_", " ")}
           </Badge>
@@ -395,256 +415,9 @@ export default function LeadDetailPage() {
           </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Lead Info Sidebar */}
-        <Card className="lg:col-span-1">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle>Lead Information</CardTitle>
-            {!isEditing ? (
-              <Button size="sm" variant="ghost" onClick={() => setIsEditing(true)}>
-                <Edit className="h-4 w-4" />
-              </Button>
-            ) : (
-              <div className="flex gap-2">
-                <Button size="sm" variant="ghost" onClick={handleUpdateLead}>
-                  <Save className="h-4 w-4" />
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => {
-                    setIsEditing(false)
-                    setEditedLead(lead)
-                  }}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            )}
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Name */}
-            <div>
-              <label className="text-sm font-medium flex items-center gap-2 mb-2">
-                <User className="h-4 w-4" />
-                Name
-              </label>
-              {isEditing ? (
-                <Input
-                  value={editedLead.name || ""}
-                  onChange={(e) => setEditedLead({ ...editedLead, name: e.target.value })}
-                />
-              ) : (
-                <p className="text-sm">{lead.name}</p>
-              )}
-            </div>
-
-            {/* Email */}
-            <div>
-              <label className="text-sm font-medium flex items-center gap-2 mb-2">
-                <Mail className="h-4 w-4" />
-                Email
-              </label>
-              {isEditing ? (
-                <Input
-                  type="email"
-                  value={editedLead.email || ""}
-                  onChange={(e) => setEditedLead({ ...editedLead, email: e.target.value })}
-                  placeholder="email@example.com"
-                />
-              ) : (
-                <p className="text-sm">{lead.email || "Not provided"}</p>
-              )}
-            </div>
-
-            {/* Phone */}
-            <div>
-              <label className="text-sm font-medium flex items-center gap-2 mb-2">
-                <Phone className="h-4 w-4" />
-                Phone
-              </label>
-              {isEditing ? (
-                <Input
-                  type="tel"
-                  value={editedLead.phone || ""}
-                  onChange={(e) => setEditedLead({ ...editedLead, phone: e.target.value })}
-                  placeholder="+1 (555) 000-0000"
-                />
-              ) : (
-                <p className="text-sm">{lead.phone || "Not provided"}</p>
-              )}
-            </div>
-
-            <Separator />
-
-            {/* Discord Username */}
-            {lead.discordUsername && (
-              <div>
-                <label className="text-sm font-medium flex items-center gap-2 mb-2">
-                  💬 Discord
-                </label>
-                <p className="text-sm">{lead.discordUsername}</p>
-              </div>
-            )}
-
-            {/* Source */}
-            <div>
-              <label className="text-sm font-medium flex items-center gap-2 mb-2">
-                Source
-              </label>
-              <Badge variant="outline" className="capitalize">
-                {lead.source}
-              </Badge>
-            </div>
-
-            {/* Status */}
-            <div>
-              <label className="text-sm font-medium flex items-center gap-2 mb-2">
-                Status
-              </label>
-              {isEditing ? (
-                <Select
-                  value={editedLead.status}
-                  onValueChange={(value) =>
-                    setEditedLead({ ...editedLead, status: value as LeadStatus })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="new">New</SelectItem>
-                    <SelectItem value="in_conversation">In Conversation</SelectItem>
-                    <SelectItem value="proposal">Proposal</SelectItem>
-                    <SelectItem value="negotiation">Negotiation</SelectItem>
-                    <SelectItem value="won">Won</SelectItem>
-                    <SelectItem value="lost">Lost</SelectItem>
-                  </SelectContent>
-                </Select>
-              ) : (
-                <Badge className={statusColors[lead.status]}>
-                  {lead.status.replace("_", " ")}
-                </Badge>
-              )}
-            </div>
-
-            {/* Estimated Value */}
-            <div>
-              <label className="text-sm font-medium flex items-center gap-2 mb-2">
-                <DollarSign className="h-4 w-4" />
-                Estimated Value
-              </label>
-              {isEditing ? (
-                <Input
-                  type="number"
-                  value={editedLead.estimatedValue || ""}
-                  onChange={(e) =>
-                    setEditedLead({ ...editedLead, estimatedValue: Number(e.target.value) })
-                  }
-                  placeholder="1000"
-                />
-              ) : (
-                <p className="text-sm">
-                  {lead.estimatedValue ? `$${lead.estimatedValue}` : "Not set"}
-                </p>
-              )}
-            </div>
-
-            <Separator />
-
-            {/* Next Follow-up Date */}
-            <div>
-              <label className="text-sm font-medium flex items-center gap-2 mb-2">
-                <Calendar className="h-4 w-4" />
-                Next Follow-up
-              </label>
-              {isEditing ? (
-                <Input
-                  type="date"
-                  value={editedLead.nextFollowUpDate ? new Date(editedLead.nextFollowUpDate).toISOString().split('T')[0] : ""}
-                  onChange={(e) =>
-                    setEditedLead({ ...editedLead, nextFollowUpDate: e.target.value ? new Date(e.target.value).toISOString() : undefined })
-                  }
-                />
-              ) : (
-                <p className="text-sm">
-                  {lead.nextFollowUpDate
-                    ? format(new Date(lead.nextFollowUpDate), "MMM d, yyyy")
-                    : "Not set"}
-                </p>
-              )}
-            </div>
-
-            {/* Last Contact */}
-            <div>
-              <label className="text-sm font-medium flex items-center gap-2 mb-2">
-                <MessageSquare className="h-4 w-4" />
-                Last Contact
-              </label>
-              <p className="text-sm">
-                {lead.lastContactDate
-                  ? format(new Date(lead.lastContactDate), "MMM d, yyyy 'at' h:mm a")
-                  : "Never"}
-              </p>
-            </div>
-
-            {/* Last Contact */}
-            {/* <div>
-              <label className="text-sm font-medium flex items-center gap-2 mb-2">
-                <Calendar className="h-4 w-4" />
-                Last Contact
-              </label>
-              <p className="text-sm">
-                {lead.lastContactDate
-                  ? format(new Date(lead.lastContactDate), "MMM d, yyyy 'at' h:mm a")
-                  : "Never"}
-              </p>
-            </div> */}
-
-            {/* Tags */}
-            {/* <div>
-              <label className="text-sm font-medium flex items-center gap-2 mb-2">
-                <Tag className="h-4 w-4" />
-                Tags
-              </label>
-              <div className="flex flex-wrap gap-2">
-                {lead.tags.map((tag, idx) => (
-                  <Badge key={idx} variant="secondary">
-                    {tag}
-                  </Badge>
-                ))}
-              </div>
-            </div> */}
-
-            {/* Notes */}
-            {/* <div>
-              <label className="text-sm font-medium mb-2 block">Notes</label>
-              {isEditing ? (
-                <Textarea
-                  value={editedLead.notes || ""}
-                  onChange={(e) => setEditedLead({ ...editedLead, notes: e.target.value })}
-                  placeholder="Add notes about this lead..."
-                  rows={4}
-                />
-              ) : (
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {lead.notes || "No notes added"}
-                </p>
-              )}
-            </div> */}
-
-            {/* Created Date */}
-            {/* <div>
-              <label className="text-sm font-medium mb-2 block">Created</label>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                {format(new Date(lead.createdAt), "MMM d, yyyy 'at' h:mm a")}
-              </p>
-            </div> */}
-          </CardContent>
-        </Card>
-
+      <div className="w-full h-full flex flex-col gap-6">
         {/* Messages Panel */}
-        <Card className="lg:col-span-2 flex flex-col" style={{ height: 'calc(100vh - 180px)' }}>
+        <Card className="w-full flex flex-col" style={{ height: 'calc(100vh - 180px)' }}>
           <CardHeader className="flex-shrink-0 py-4">
             <div className="flex items-center justify-between">
               <div>

@@ -2,10 +2,18 @@
 
 import { useEffect, useState } from "react"
 import { useAuth } from "@/components/auth-provider"
-import { Navbar } from "@/components/navbar"
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { DollarSign, TrendingUp, Users, Briefcase, Loader2 } from "lucide-react"
 import api from "@/lib/api"
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
 
 interface DashboardStats {
   totalRevenue: number
@@ -14,7 +22,7 @@ interface DashboardStats {
   avgDealSize: number
   totalLeads: number
   wonLeads: number
-  lostLeads: numberema
+  lostLeads: number
 }
 
 interface Activity {
@@ -112,36 +120,39 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white dark:bg-gray-950">
-        <Navbar />
-        <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 flex items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-gray-900 dark:text-white" />
-        </main>
+      <div className="flex h-[calc(100vh-4rem)] items-center justify-center bg-white dark:bg-gray-950">
+        <Loader2 className="h-8 w-8 animate-spin text-gray-900 dark:text-white" />
       </div>
     )
   }
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-white dark:bg-gray-950">
-        <Navbar />
-        <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Not Logged In</h2>
-            <p className="text-gray-600 dark:text-gray-400">Please log in to view your dashboard.</p>
-          </div>
-        </main>
+      <div className="flex h-[calc(100vh-4rem)] items-center justify-center bg-white dark:bg-gray-950">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Not Logged In</h2>
+          <p className="text-gray-600 dark:text-gray-400">Please log in to view your dashboard.</p>
+        </div>
       </div>
     )
   }
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950">
-      <Navbar />
+
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-balance text-gray-900 dark:text-white">Welcome back, {user?.name || 'Creator'}</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">Here's what's happening with your partnerships today.</p>
+        <div className="mb-8 space-y-4">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbPage>Dashboard</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+          <div>
+            <h1 className="text-3xl font-bold text-balance text-gray-900 dark:text-white">Welcome back, {user?.name || 'Creator'}</h1>
+            <p className="text-gray-600 dark:text-gray-400 mt-1">Here's what's happening with your partnerships today.</p>
+          </div>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
