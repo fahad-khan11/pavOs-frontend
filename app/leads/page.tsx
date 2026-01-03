@@ -163,7 +163,7 @@ export default function LeadsPage() {
             <div>
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Leads</h1>
               <p className="text-gray-600 dark:text-gray-400 mt-1">
-                Manage your leads from Discord .
+                Manage your leads  .
               </p>
             </div>
             <Button onClick={() => router.push("/leads/new")} variant="outline">
@@ -267,7 +267,7 @@ export default function LeadsPage() {
               </SelectTrigger>
               <SelectContent className="bg-white dark:bg-[#101828]">
                 <SelectItem value="all">All Sources</SelectItem>
-                <SelectItem value="discord">Discord</SelectItem>
+                {/* <SelectItem value="discord">Discord</SelectItem> */}
                 {/* <SelectItem value="instagram">Instagram</SelectItem>
                 <SelectItem value="tiktok">TikTok</SelectItem>
                 <SelectItem value="whop">Whop</SelectItem> */}
