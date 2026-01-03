@@ -153,7 +153,7 @@ export default function ContactsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-950">
+    <div className="min-h-screen bg-white dark:bg-gray-950 p-8">
 
       <main className="container mx-auto py-8">
         {/* Header */}

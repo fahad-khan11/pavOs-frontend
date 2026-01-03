@@ -48,6 +48,7 @@ export function Sidebar({ className }: SidebarProps) {
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     { name: "Leads", href: "/leads", icon: MessageSquare },
     { name: "Pipeline", href: "/pipeline", icon: Kanban },
+    { name: "Contacts", href: "/contacts", icon: User },
     { name: "Analytics", href: "/analytics", icon: BarChart3 },
   ]
 
@@ -59,7 +60,7 @@ export function Sidebar({ className }: SidebarProps) {
           isCollapsed ? "w-16" : "w-64",
           className
         )}
-      >
+      > 
         {/* Toggle Button */}
         <div className="absolute -right-4 top-7 z-20">
             <Button
