@@ -427,7 +427,7 @@ export default function LeadDetailPage() {
                 </CardTitle>
                 <CardDescription className="flex items-center gap-2 mt-1">
                   {/* ✅ FIXED: Updated message for channel-based routing */}
-                  Send and receive Discord messages
+                  Send and receive messages
                   {/* Socket Status Indicator */}
                   <span className="flex items-center gap-1 text-xs ml-2">
                     <span className={`h-2 w-2 rounded-full ${isConnected ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`} />
