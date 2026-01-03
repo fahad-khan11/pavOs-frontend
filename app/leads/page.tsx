@@ -322,7 +322,11 @@ export default function LeadsPage() {
                       <TableRow
                         key={lead.id}
                         className="cursor-pointer"
-                        onClick={() => router.push(`/leads/${lead.id}`)}
+                        onClick={() => {
+                          if (lead.source !== "manual") {
+                            router.push(`/leads/${lead.id}`)
+                          }
+                        }}
                       >
                         <TableCell className="font-medium text-gray-900 dark:text-white">
                           <div className="flex items-center gap-2">
