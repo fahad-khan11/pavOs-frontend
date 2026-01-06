@@ -323,7 +323,7 @@ export default function LeadsPage() {
                         key={lead.id}
                         className="cursor-pointer"
                         onClick={() => {
-                          if (lead.source !== "manual") {
+                          if (lead.source !== "manual" && lead.source !== "whop") {
                             router.push(`/leads/${lead.id}`)
                           }
                         }}
