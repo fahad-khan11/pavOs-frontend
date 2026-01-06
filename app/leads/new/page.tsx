@@ -224,7 +224,7 @@ export default function NewLeadPage() {
                       </SelectTrigger>
                       <SelectContent className="bg-white dark:bg-gray-900">
                         <SelectItem value="manual">Manual</SelectItem>
-                        {/* <SelectItem value="discord">Discord</SelectItem> */}
+                        <SelectItem value="discord">Discord</SelectItem>
                         {/* <SelectItem value="instagram">Instagram</SelectItem> */}
                         {/* <SelectItem value="tiktok">TikTok</SelectItem> */}
                         {/* <SelectItem value="whop">Whop</SelectItem> */}
