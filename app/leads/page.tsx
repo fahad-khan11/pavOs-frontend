@@ -380,7 +380,7 @@ export default function LeadsPage() {
                           </div>
                         </TableCell>
                         <TableCell>
-                          {lead.source !== "manual" && (
+                          {(lead.source !== "manual" && lead.source !== "whop") && (
                             <Button
                               size="sm"
                               variant="ghost"
