@@ -6,7 +6,6 @@ import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import {
   Tooltip,
@@ -95,8 +94,8 @@ export function Sidebar({ className }: SidebarProps) {
           )}
         </div>
 
-        <ScrollArea className="flex-1 px-3 py-4">
-          <nav className="flex flex-col gap-2">
+        <div className="flex-1 min-h-0 overflow-y-auto">
+          <nav className="flex flex-col gap-2 px-3 py-4">
             {navigation.map((item) => {
               const Icon = item.icon
               const isActive = pathname === item.href || pathname?.startsWith(item.href + "/")
@@ -138,7 +137,7 @@ export function Sidebar({ className }: SidebarProps) {
               )
             })}
           </nav>
-        </ScrollArea>
+        </div>
 
         {/* User Profile Section */}
         <div className="border-t border-white/10 p-3">
