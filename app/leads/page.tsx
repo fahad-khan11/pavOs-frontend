@@ -319,7 +319,9 @@ export default function LeadsPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredLeads.map((lead) => (
+                   {filteredLeads
+                    .filter((lead) => lead.source !== "discord") // TEMP: hide discord leads
+                    .map((lead) => (
                       <TableRow
                         key={lead.id}
                         className="cursor-pointer"
