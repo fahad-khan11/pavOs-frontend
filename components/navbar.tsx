@@ -127,10 +127,10 @@ export function Navbar() {
                 <User className="mr-2 h-4 w-4" />
                 Profile
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/settings/integrations')} className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800">
+              {/* <DropdownMenuItem onClick={() => router.push('/settings/integrations')} className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800">
                 <Settings className="mr-2 h-4 w-4" />
                 Integrations
-              </DropdownMenuItem>
+              </DropdownMenuItem> */}
             </DropdownMenuContent>
           </DropdownMenu>
           </div>
