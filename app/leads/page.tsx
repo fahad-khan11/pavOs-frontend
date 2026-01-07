@@ -180,14 +180,14 @@ export default function LeadsPage() {
             <Card>
               <CardHeader className="pb-2">
                 <CardDescription className="truncate">Total Leads</CardDescription>
-                <CardTitle className="text-2xl">{stats.total}</CardTitle>
+                <CardTitle className="text-2xl">{stats.total - ((stats as any).discord ?? 0)}</CardTitle>
               </CardHeader>
             </Card>
             <Card>
               <CardHeader className="pb-2">
                 <CardDescription className="truncate">New</CardDescription>
                 <CardTitle className="text-2xl flex items-center justify-between">
-                  {stats.new}
+                  {stats.new - ((stats as any).discord_new ?? 0)}
                   <Badge className={statusColors.new}>New</Badge>
                 </CardTitle>
               </CardHeader>
@@ -196,7 +196,7 @@ export default function LeadsPage() {
               <CardHeader className="pb-2">
                 <CardDescription className="truncate" title="In Conversation">In Conversation</CardDescription>
                 <CardTitle className="text-2xl flex items-center justify-between">
-                  {stats.in_conversation}
+                  {stats.in_conversation - ((stats as any).discord_in_conversation ?? 0)}
                   <Badge className={statusColors.in_conversation}>Active</Badge>
                 </CardTitle>
               </CardHeader>
@@ -205,7 +205,7 @@ export default function LeadsPage() {
               <CardHeader className="pb-2">
                 <CardDescription className="truncate">Proposal</CardDescription>
                 <CardTitle className="text-2xl flex items-center justify-between">
-                  {stats.proposal}
+                  {stats.proposal -((stats as any).discord ?? 0)}
                   <Badge className={statusColors.proposal}>Proposal</Badge>
                 </CardTitle>
               </CardHeader>
@@ -214,7 +214,7 @@ export default function LeadsPage() {
               <CardHeader className="pb-2">
                 <CardDescription className="truncate">Won</CardDescription>
                 <CardTitle className="text-2xl flex items-center justify-between">
-                  {stats.won}
+                  {stats.won - ((stats as any).discord_won ?? 0)}
                   <Badge className={statusColors.won}>Won</Badge>
                 </CardTitle>
               </CardHeader>
@@ -222,7 +222,7 @@ export default function LeadsPage() {
             <Card>
               <CardHeader className="pb-2">
                 <CardDescription className="truncate">Lost</CardDescription>
-                <CardTitle className="text-2xl">{stats.lost}</CardTitle>
+                <CardTitle className="text-2xl">{stats.lost - ((stats as any).discord ?? 0)}</CardTitle>
               </CardHeader>
             </Card>
           </div>

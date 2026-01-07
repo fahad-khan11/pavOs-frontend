@@ -106,7 +106,7 @@ export default function DashboardPage() {
     },
     {
       title: "Active Leads",
-      value: stats.activeDeals.toString(),
+      value: (stats.activeDeals - ((stats as any).discord ?? 0)).toString(),
       description: `${stats.totalLeads} total leads`,
       icon: Users,
     },
@@ -211,7 +211,7 @@ export default function DashboardPage() {
                     <p className="text-sm font-medium text-gray-900 dark:text-white">Total Leads</p>
                     <p className="text-xs text-gray-600 dark:text-gray-400">All time</p>
                   </div>
-                  <span className="text-2xl font-bold text-gray-900 dark:text-white">{stats?.totalLeads || 0}</span>
+                  <span className="text-2xl font-bold text-gray-900 dark:text-white">{stats?.totalLeads}</span>
                 </div>
                 <div className="flex items-center justify-between pb-3 border-b border-gray-200 dark:border-gray-800">
                   <div>
