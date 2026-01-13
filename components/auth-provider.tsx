@@ -19,15 +19,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const storedUser = getStoredUser()
-    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null
+    
+    // ✅ WHOP-FIRST: Check for Whop context in sessionStorage
+    const whopUserId = typeof window !== 'undefined' ? sessionStorage.getItem('whop_user_id') : null
+    const whopCompanyId = typeof window !== 'undefined' ? sessionStorage.getItem('whop_company_id') : null
     
     setUser(storedUser)
     setIsLoading(false)
 
-    // Connect socket if user is logged in and we have a token
-    if (storedUser && token) {
-      console.log("🔌 Connecting socket for user:", storedUser.id)
-      connectSocket(storedUser.id, token)
+    // Connect socket if we have Whop context
+    if (whopUserId && whopCompanyId) {
+      console.log("🔌 Connecting socket with Whop context:", { whopUserId, whopCompanyId })
+      connectSocket(whopUserId, whopCompanyId)
     }
 
     // Cleanup: disconnect socket on unmount
@@ -39,10 +42,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Watch for user changes and connect/disconnect socket accordingly
   useEffect(() => {
     if (user) {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null
-      if (token) {
-        console.log("🔌 Connecting socket for user:", user.id)
-        connectSocket(user.id, token)
+      const whopUserId = typeof window !== 'undefined' ? sessionStorage.getItem('whop_user_id') : null
+      const whopCompanyId = typeof window !== 'undefined' ? sessionStorage.getItem('whop_company_id') : null
+      
+      if (whopUserId && whopCompanyId) {
+        console.log("🔌 Connecting socket for user with Whop context")
+        connectSocket(whopUserId, whopCompanyId)
       }
     } else {
       console.log("🔌 Disconnecting socket")

@@ -162,8 +162,8 @@ class DiscordService {
   /**
    * Send Discord message
    * 
-   * ✅ UPDATED: Now supports both channel-based (leadId) and DM-based (discordUserId) sending
-   * - Use leadId (recommended): Channel-based routing with deterministic ownership
+   * ✅ UPDATED: Now supports both Discord and Whop via smart routing
+   * - Use leadId (recommended): Routes to Discord OR Whop based on lead's source
    * - Use discordUserId (legacy): DM-based routing for backward compatibility
    */
   async sendMessage(data: {
@@ -176,6 +176,13 @@ class DiscordService {
     messageId?: string;
     method: 'channel' | 'dm';  // ✅ NEW: Indicates which routing method was used
   }> {
+    // Use smart routing endpoint that handles both Discord and Whop
+    if (data.leadId) {
+      const response = await api.post(`/leads/${data.leadId}/send-message`, { content: data.content });
+      return response.data.data;
+    }
+    
+    // Legacy fallback for direct Discord messaging
     const response = await api.post('/integrations/discord/send-message', data);
     return response.data.data;
   }

@@ -1,7 +1,9 @@
 import axios, { AxiosInstance, AxiosError } from 'axios';
 
-// API Configuration
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
+// ✅ WHOP-COMPLIANT: Use Next.js API routes (which verify Whop token server-side)
+// Instead of calling backend directly, we call our Next.js API routes
+// The API routes verify Whop token and forward to backend
+const API_BASE_URL = '/api/proxy'; // Next.js API routes
 
 // Create axios instance
 export const api: AxiosInstance = axios.create({
@@ -11,12 +13,18 @@ export const api: AxiosInstance = axios.create({
   },
 });
 
-// Request interceptor to add auth token
+// Request interceptor - Add companyId to all requests
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('auth_token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    if (typeof window !== 'undefined') {
+      const whopCompanyId = sessionStorage.getItem('whop_company_id');
+      
+      // Add companyId as query param for all requests
+      if (whopCompanyId) {
+        const url = new URL(config.url || '', window.location.origin);
+        url.searchParams.set('companyId', whopCompanyId);
+        config.url = url.pathname + url.search;
+      }
     }
     return config;
   },
@@ -25,40 +33,19 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor to handle errors and token refresh
+// Response interceptor - simplified error handling
 api.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
-    const originalRequest = error.config as any;
-
-    // If 401 and not already retried, try to refresh token
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-
-      try {
-        const refreshToken = localStorage.getItem('refresh_token');
-        if (refreshToken) {
-          const response = await axios.post(`${API_BASE_URL}/auth/refresh`, {
-            refreshToken,
-          });
-
-          const { accessToken } = response.data.data;
-          localStorage.setItem('auth_token', accessToken);
-
-          // Retry original request with new token
-          originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-          return api(originalRequest);
-        }
-      } catch (refreshError) {
-        // Refresh failed - Whop handles authentication
-        localStorage.removeItem('auth_token');
-        localStorage.removeItem('refresh_token');
+    if (error.response?.status === 401) {
+      console.error('❌ Authentication failed. Please reload the app in Whop.');
+      // Clear stale data
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('whop_user_id');
+        sessionStorage.removeItem('whop_company_id');
         localStorage.removeItem('user');
-        // Don't redirect to /login - Whop handles auth
-        return Promise.reject(refreshError);
       }
     }
-
     return Promise.reject(error);
   }
 );
