@@ -26,7 +26,13 @@ export function WhopDashboardWrapper({
   useEffect(() => {
     const authenticateWithPaveOS = async () => {
       try {
-        // Call backend to authenticate Whop user and get PaveOS tokens
+        console.log("🔐 Authenticating with PaveOS using Whop context:", { whopUserId, whopCompanyId })
+
+        // ✅ WHOP-FIRST: Store Whop identifiers in sessionStorage (more reliable in iframes)
+        sessionStorage.setItem("whop_user_id", whopUserId)
+        sessionStorage.setItem("whop_company_id", whopCompanyId)
+
+        // Call backend to create/update user (no tokens returned)
         const response = await axios.post(
           `${process.env.NEXT_PUBLIC_API_URL}/auth/whop`,
           {
@@ -37,28 +43,26 @@ export function WhopDashboardWrapper({
           }
         )
 
-        const { accessToken, refreshToken, user } = response.data.data
-        console.log("✅ Authenticated with PaveOS for user:", response.data.data)
+        const { user } = response.data.data
+        console.log("✅ Authenticated with PaveOS for user:", user)
 
-        // Store tokens and user in localStorage with correct keys
-        localStorage.setItem("auth_token", accessToken)
-        localStorage.setItem("refresh_token", refreshToken)
+        // Store user data (for display purposes only, not auth)
         localStorage.setItem("user", JSON.stringify(user))
 
-        // Connect socket with user credentials
-        console.log("🔌 Connecting socket after Whop auth for user:", user.id)
-        connectSocket(user.id, accessToken)
+        // Connect socket with Whop identifiers
+        console.log("🔌 Connecting socket with Whop context")
+        connectSocket(whopUserId, whopCompanyId)
 
         // Mark as authenticated to show dashboard content
         setIsAuthenticated(true)
       } catch (err: any) {
-        console.error("Whop authentication error:", err)
+        console.error("❌ Whop authentication error:", err)
         setError(err.response?.data?.message || "Failed to authenticate with PaveOS")
       }
     }
 
     authenticateWithPaveOS()
-  }, [whopUserId, whopCompanyId, router])
+  }, [whopUserId, whopCompanyId, whopEmail, whopUsername])
 
   if (error) {
     return (

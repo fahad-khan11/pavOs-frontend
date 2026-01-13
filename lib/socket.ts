@@ -20,27 +20,32 @@ const SOCKET_URL = getSocketUrl();
 
 let socket: Socket | null = null;
 
-export const connectSocket = (userId: string, token: string) => {
+export const connectSocket = (whopUserId: string, whopCompanyId: string) => {
   if (socket?.connected) {
     socket.disconnect();
   }
+
+  console.log("🔌 Connecting socket with Whop context:", { whopUserId, whopCompanyId });
 
   socket = io(SOCKET_URL, {
     withCredentials: true,
     autoConnect: false,
     auth: {
-      token,
-      userId,
+      whopUserId,
+      whopCompanyId,
     },
   });
 
   socket.connect();
 
   socket.on("connect", () => {
-    socket?.emit("join-user", userId);
+    console.log("✅ Socket connected");
+    socket?.emit("join-user", whopUserId);
+    socket?.emit("join-company", whopCompanyId);
   });
 
   socket.on("disconnect", (reason) => {
+    console.log("🔌 Socket disconnected:", reason);
     if (reason === "io server disconnect" || reason === "transport error") {
       console.error("Socket disconnected:", reason);
     }

@@ -24,6 +24,25 @@ export default async function WhopDashboardPage({ params, searchParams }: PagePr
       userId = result.userId;
     }
 
+    // ✅ WHOP REQUIREMENT: Check if user has admin access to this company
+    const access = await whopSdk.users.checkAccess(
+      companyId,
+      { id: userId }
+    );
+
+    if (access.access_level !== "admin") {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-950">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-red-600 dark:text-red-400 mb-4">Access Denied</h1>
+            <p className="text-gray-600 dark:text-gray-400">
+              Admin access required. Only team members can access this dashboard.
+            </p>
+          </div>
+        </div>
+      );
+    }
+
     let userEmail: string | undefined = undefined;
     let userName: string | undefined = undefined;
 
