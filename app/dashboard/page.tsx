@@ -39,16 +39,12 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // If auth is still loading, wait
     if (authLoading) {
       return
     }
-    
-    // If auth is done and we have a user, load data
     if (user) {
       loadDashboardData()
     } else {
-      // No user after auth loading is done
       setLoading(false)
     }
   }, [user, authLoading])
