@@ -5,60 +5,63 @@ export const dynamic = "force-dynamic";
 
 export default async function DashboardPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ companyId: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const { companyId } = await params;
+  const sp = await searchParams;
 
-  try {
-    const h = await headers();
+  const h = await headers();
 
-    const tokenExists = Boolean(h.get("x-whop-user-token"));
-    if (!tokenExists) {
-      return (
-        <div style={{ padding: 24 }}>
-          <h2>Missing Whop token</h2>
-          <p>
-            Open via Whop iframe or dev proxy (localhost:3000). You are currently
-            hitting the app without the required header.
-          </p>
-        </div>
-      );
-    }
+  // 1) Production / iframe: token comes in headers
+  const headerToken = h.get("x-whop-user-token");
 
-    const { userId } = await whopsdk.verifyUserToken(h);
+  // 2) Dev proxy: token is coming in query string
+  const devTokenRaw = sp["whop-dev-user-token"];
+  const devToken = Array.isArray(devTokenRaw) ? devTokenRaw[0] : devTokenRaw;
 
-    const [company, user, access] = await Promise.all([
-      whopsdk.companies.retrieve(companyId),
-      whopsdk.users.retrieve(userId),
-      whopsdk.users.checkAccess(companyId, { id: userId }),
-    ]);
+  // Choose the token source
+  const token = headerToken || devToken;
 
-
-	console.log(company,user, access)
+  if (!token) {
     return (
       <div style={{ padding: 24 }}>
-        <h1>Dashboard</h1>
-
-        <h3>User</h3>
-        <pre>{JSON.stringify(user, null, 2)}</pre>
-
-        <h3>Company</h3>
-        <pre>{JSON.stringify(company, null, 2)}</pre>
-
-        <h3>Access</h3>
-        <pre>{JSON.stringify(access, null, 2)}</pre>
-      </div>
-    );
-  } catch (err: any) {
-    // Shows the error safely (without leaking secrets)
-    return (
-      <div style={{ padding: 24 }}>
-        <h2>Server error</h2>
-        <pre style={{ whiteSpace: "pre-wrap" }}>
-          {err?.message || String(err)}
-        </pre>
+        <h2>Missing Whop token</h2>
+        <p>
+          Token not found in headers or query. Open through Whop iframe or dev
+          proxy.
+        </p>
+        <pre>{JSON.stringify({ headerKeys: [...h.keys()], searchParams: sp }, null, 2)}</pre>
       </div>
     );
   }
+
+  // IMPORTANT: verifyUserToken expects headers. In dev, we manually provide the header.
+  const verifyHeaders = new Headers();
+  verifyHeaders.set("x-whop-user-token", token);
+
+  const { userId } = await whopsdk.verifyUserToken(verifyHeaders);
+
+  const [company, user, access] = await Promise.all([
+    whopsdk.companies.retrieve(companyId),
+    whopsdk.users.retrieve(userId),
+    whopsdk.users.checkAccess(companyId, { id: userId }),
+  ]);
+
+  return (
+    <div style={{ padding: 24 }}>
+      <h1>Dashboard</h1>
+
+      <h3>User</h3>
+      <pre>{JSON.stringify(user, null, 2)}</pre>
+
+      <h3>Company</h3>
+      <pre>{JSON.stringify(company, null, 2)}</pre>
+
+      <h3>Access</h3>
+      <pre>{JSON.stringify(access, null, 2)}</pre>
+    </div>
+  );
 }
