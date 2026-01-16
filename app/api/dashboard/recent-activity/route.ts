@@ -1,10 +1,11 @@
+import { whopsdk } from '@/lib/whop-sdk';
 import { NextRequest, NextResponse } from 'next/server';
-import { whopSdk } from '@/lib/whop-sdk';
+
 
 export async function GET(req: NextRequest) {
   try {
     // ✅ Verify Whop token on every request (server-side)
-    const { userId } = await whopSdk.verifyUserToken(req.headers);
+    const { userId } = await whopsdk.verifyUserToken(req.headers);
     
     const companyId = req.nextUrl.searchParams.get('companyId');
     const limit = req.nextUrl.searchParams.get('limit') || '5';
@@ -17,7 +18,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Verify access
-    const access = await whopSdk.users.checkAccess(companyId, { id: userId });
+    const access = await whopsdk.users.checkAccess(companyId, { id: userId });
     if (access.access_level !== 'admin') {
       return NextResponse.json(
         { success: false, error: 'Admin access required' },

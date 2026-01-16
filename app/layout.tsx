@@ -12,6 +12,7 @@ import { WhopApp } from "@whop/react/components"
 import { Sidebar } from "@/components/sidebar"
 import { Navbar } from "@/components/navbar"
 import Providers from "./provides"
+import { AuthProvider } from "@/components/auth-provider"
 
 
 const inter = Inter({ subsets: ["latin"] })
@@ -40,8 +41,11 @@ export default function RootLayout({
           <WhopThemeSync />
           <WhopApp accentColor="blue" appearance="inherit">
             <WhopThemeWrapper>
+            <AuthProvider>
+          {children}
+        </AuthProvider>
               {/* <AuthProvider> */}
-                <div className="flex h-screen overflow-hidden">
+                {/* <div className="flex h-screen overflow-hidden">
                   <div className="hidden md:block">
                     <Sidebar />
                   </div>
@@ -51,7 +55,7 @@ export default function RootLayout({
                     {children}
                    </Providers>
                   </main>
-                </div>
+                </div> */}
               {/* </AuthProvider> */}
             </WhopThemeWrapper>
           </WhopApp>

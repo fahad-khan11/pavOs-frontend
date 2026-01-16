@@ -1,67 +1,63 @@
-// app/dashboard/[companyId]/page.tsx
-import { whopsdk } from "@/lib/whop-sdk";
 import { headers } from "next/headers";
+import { whopsdk } from "@/lib/whop-sdk";
 
-export default async function WhopDashboardPage({
+export const dynamic = "force-dynamic";
+
+export default async function DashboardPage({
   params,
 }: {
-  params: { companyId: string };
+  params: Promise<{ companyId: string }>;
 }) {
-  const companyId = params.companyId;
-  
+  const { companyId } = await params;
+
   try {
-    // Get headers
-    const headersList = await headers();
-    const referer = headersList.get('referer');
-    
-    console.log('Referer URL:', referer);
-    
-    // Extract token from referer URL
-    let userToken: string | null = null;
-    
-    if (referer) {
-      // Parse the referer URL to get query params
-      const url = new URL(referer);
-      userToken = url.searchParams.get('whop-dev-user-token');
+    const h = await headers();
+
+    const tokenExists = Boolean(h.get("x-whop-user-token"));
+    if (!tokenExists) {
+      return (
+        <div style={{ padding: 24 }}>
+          <h2>Missing Whop token</h2>
+          <p>
+            Open via Whop iframe or dev proxy (localhost:3000). You are currently
+            hitting the app without the required header.
+          </p>
+        </div>
+      );
     }
-    
-    console.log('Extracted token:', userToken ? 'Yes' : 'No');
-    
-    if (!userToken) {
-      // Also check direct headers (just in case)
-      userToken = headersList.get('x-whop-user-token');
-    }
-    
-    if (!userToken) {
-      throw new Error('No Whop user token found in referer or headers');
-    }
-    
-    // Now verify the token
-    const { userId } = await whopsdk.verifyUserToken(userToken);
-    console.log('✅ Authenticated! User ID:', userId);
-    
-    // Fetch data
+
+    const { userId } = await whopsdk.verifyUserToken(h);
+
     const [company, user, access] = await Promise.all([
-      whopsdk.companies.retrieveCompany({ companyId }),
-      whopsdk.apps.retrieveAuthenticatedUser({ userToken }),
-      whopsdk.apps.retrieveUserAccess({ userToken }),
+      whopsdk.companies.retrieve(companyId),
+      whopsdk.users.retrieve(userId),
+      whopsdk.users.checkAccess(companyId, { id: userId }),
     ]);
-    
+
+
+	console.log(company,user, access)
     return (
-      <div>
-        <h1>Welcome to {company.username}'s Dashboard</h1>
-        <p>User: {user.username}</p>
-        {/* Your dashboard content */}
+      <div style={{ padding: 24 }}>
+        <h1>Dashboard</h1>
+
+        <h3>User</h3>
+        <pre>{JSON.stringify(user, null, 2)}</pre>
+
+        <h3>Company</h3>
+        <pre>{JSON.stringify(company, null, 2)}</pre>
+
+        <h3>Access</h3>
+        <pre>{JSON.stringify(access, null, 2)}</pre>
       </div>
     );
-    
-  } catch (error) {
-    console.error('Authentication error:', error);
+  } catch (err: any) {
+    // Shows the error safely (without leaking secrets)
     return (
-      <div style={{ padding: '20px', color: 'red' }}>
-        <h1>Authentication Error</h1>
-        <p>{error instanceof Error ? error.message : "Unknown error"}</p>
-        <p>Token extracted from Referer URL</p>
+      <div style={{ padding: 24 }}>
+        <h2>Server error</h2>
+        <pre style={{ whiteSpace: "pre-wrap" }}>
+          {err?.message || String(err)}
+        </pre>
       </div>
     );
   }

@@ -1,12 +1,13 @@
+import { whopsdk } from '@/lib/whop-sdk';
 import { NextRequest, NextResponse } from 'next/server';
-import { whopSdk } from '@/lib/whop-sdk';
+
 
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { userId } = await whopSdk.verifyUserToken(req.headers);
+    const { userId } = await whopsdk.verifyUserToken(req.headers);
     const { id: leadId } = await params;
     const companyId = req.nextUrl.searchParams.get('companyId');
     
@@ -17,7 +18,7 @@ export async function GET(
       );
     }
 
-    const access = await whopSdk.users.checkAccess(companyId, { id: userId });
+    const access = await whopsdk.users.checkAccess(companyId, { id: userId });
     if (access.access_level !== 'admin') {
       return NextResponse.json(
         { success: false, error: 'Admin access required' },
@@ -53,7 +54,7 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { userId } = await whopSdk.verifyUserToken(req.headers);
+    const { userId } = await whopsdk.verifyUserToken(req.headers);
     const { id: leadId } = await params;
     const body = await req.json();
     const { companyId } = body;
@@ -65,7 +66,7 @@ export async function PUT(
       );
     }
 
-    const access = await whopSdk.users.checkAccess(companyId, { id: userId });
+    const access = await whopsdk.users.checkAccess(companyId, { id: userId });
     if (access.access_level !== 'admin') {
       return NextResponse.json(
         { success: false, error: 'Admin access required' },

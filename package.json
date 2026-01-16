@@ -2,15 +2,15 @@
   "name": "my-v0-project",
   "version": "0.1.0",
   "private": true,
-  "scripts": {
-    "build": "next build",
-    "dev": "next dev",
-    "lint": "eslint .",
-    "start": "next start"
-  },
+"scripts": {
+  "dev:next": "next dev --turbopack -p 5000",
+  "dev": "whop-proxy --command \"npm run dev:next\"",
+  "build": "next build",
+  "start": "next start",
+  "lint": "eslint ."
+},
   "description": "Close deals, deliver work, and get paid faster. The all-in-one platform for modern creators (Updated).",
   "dependencies": {
-    "@vercel/functions": "^3.1.4",
     "@hookform/resolvers": "^3.10.0",
     "@radix-ui/react-accordion": "1.2.2",
     "@radix-ui/react-alert-dialog": "1.1.4",
@@ -41,6 +41,7 @@
     "@radix-ui/react-tooltip": "1.1.6",
     "@reduxjs/toolkit": "^2.11.2",
     "@vercel/analytics": "latest",
+    "@vercel/functions": "^3.1.4",
     "@whop/react": "^0.3.0",
     "@whop/sdk": "^0.0.3",
     "autoprefixer": "^10.4.20",
@@ -76,6 +77,8 @@
     "@types/node": "^22",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@whop-apps/dev-proxy": "^0.0.1-canary.117",
+    "dotenv-cli": "^11.0.0",
     "postcss": "^8.5",
     "tailwindcss": "^4.1.9",
     "tw-animate-css": "1.3.3",

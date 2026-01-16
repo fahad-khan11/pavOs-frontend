@@ -1,5 +1,6 @@
+import { whopsdk } from '@/lib/whop-sdk';
 import { NextRequest, NextResponse } from 'next/server';
-import { whopSdk } from '@/lib/whop-sdk';
+
 
 /**
  * Generic API proxy that verifies Whop token and forwards requests to backend
@@ -47,7 +48,7 @@ async function handleRequest(
 ) {
   try {
     // ✅ Verify Whop token on EVERY request (server-side)
-    const { userId } = await whopSdk.verifyUserToken(req.headers);
+    const { userId } = await whopsdk.verifyUserToken(req.headers);
     
     // Extract companyId from query params or body
     const companyId = req.nextUrl.searchParams.get('companyId');
@@ -78,7 +79,7 @@ async function handleRequest(
     }
 
     // Verify user has admin access to this company
-    const access = await whopSdk.users.checkAccess(companyId, { id: userId });
+    const access = await whopsdk.users.checkAccess(companyId, { id: userId });
     
     if (access.access_level !== 'admin') {
       return NextResponse.json(
