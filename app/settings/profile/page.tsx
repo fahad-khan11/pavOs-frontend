@@ -1,6 +1,6 @@
 "use client"
 
-import { useAuth } from "@/components/auth-provider"
+// import { useAuth } from "@/components/auth-provider"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -13,15 +13,15 @@ import { Loader2 } from "lucide-react"
 import { WhopProfileCard } from "@/components/whop-profile-card"
 
 export default function ProfilePage() {
-  const { isLoading: authLoading } = useAuth()
+  // const { isLoading: authLoading } = useAuth()
 
-  if (authLoading) {
-    return (
-      <div className="flex h-[calc(100vh-4rem)] items-center justify-center bg-background">
-        <Loader2 className="h-8 w-8 animate-spin text-foreground" />
-      </div>
-    )
-  }
+  // if (authLoading) {
+  //   return (
+  //     <div className="flex h-[calc(100vh-4rem)] items-center justify-center bg-background">
+  //       <Loader2 className="h-8 w-8 animate-spin text-foreground" />
+  //     </div>
+  //   )
+  // }
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950">
@@ -54,3 +54,6 @@ export default function ProfilePage() {
     </div>
   )
 }
+
+
+

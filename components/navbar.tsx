@@ -13,7 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { useAuth } from "@/components/auth-provider"
+// import { useAuth } from "@/components/auth-provider"
 import { useRouter } from "next/navigation"
 import { LayoutDashboard, Users, Kanban, BarChart3, User, Settings, MessageSquare, Menu } from "lucide-react"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
@@ -29,7 +29,7 @@ const navigation = [
 
 export function Navbar() {
   const pathname = usePathname()
-  const { user } = useAuth()
+  // const { user } = useAuth()
   const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
 
@@ -111,10 +111,10 @@ export function Navbar() {
                 <Button variant="ghost" className="gap-2 text-gray-900 hover:bg-gray-100 px-2 sm:px-4">
                   <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center">
                     <span className="text-sm font-semibold text-[#0e1d3a] dark:text-[#0e1d3a]">
-                      {user?.name?.charAt(0).toUpperCase()}
+                      {/* {user?.name?.charAt(0).toUpperCase()} */}
                     </span>
                   </div>
-                  <span className="hidden sm:inline text-gray-900 dark:text-white">{user?.name}</span>
+                  {/* <span className="hidden sm:inline text-gray-900 dark:text-white">{user?.name}</span> */}
                 </Button>
               </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 shadow-lg">

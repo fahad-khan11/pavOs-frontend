@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useAuth } from "@/components/auth-provider"
+// import { useAuth } from "@/components/auth-provider"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { DollarSign, TrendingUp, Users, Briefcase, Loader2 } from "lucide-react"
@@ -33,37 +33,37 @@ interface Activity {
 }
 
 export default function DashboardPage() {
-  const { user, isLoading: authLoading } = useAuth()
+  // const { user, isLoading: authLoading } = useAuth()
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [activities, setActivities] = useState<Activity[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    if (authLoading) {
-      return
-    }
-    if (user) {
-      loadDashboardData()
-    } else {
-      setLoading(false)
-    }
-  }, [user, authLoading])
+  // useEffect(() => {
+  //   if (authLoading) {
+  //     return
+  //   }
+  //   if (user) {
+  //     loadDashboardData()
+  //   } else {
+  //     setLoading(false)
+  //   }
+  // }, [user, authLoading])
 
-  const loadDashboardData = async () => {
-    try {
-      setLoading(true)
-      const [analyticsRes, activityRes] = await Promise.all([
-        api.get('/dashboard/analytics'),
-        api.get('/dashboard/recent-activity?limit=5')
-      ])
-      setStats(analyticsRes.data.data)
-      setActivities(activityRes.data.data || [])
-    } catch (error) {
-      console.error('Failed to load dashboard data:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  // const loadDashboardData = async () => {
+  //   try {
+  //     setLoading(true)
+  //     const [analyticsRes, activityRes] = await Promise.all([
+  //       api.get('/dashboard/analytics'),
+  //       api.get('/dashboard/recent-activity?limit=5')
+  //     ])
+  //     setStats(analyticsRes.data.data)
+  //     setActivities(activityRes.data.data || [])
+  //   } catch (error) {
+  //     console.error('Failed to load dashboard data:', error)
+  //   } finally {
+  //     setLoading(false)
+  //   }
+  // }
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -114,24 +114,24 @@ export default function DashboardPage() {
     },
   ] : []
 
-  if (loading) {
-    return (
-      <div className="flex h-[calc(100vh-4rem)] items-center justify-center bg-white dark:bg-gray-950">
-        <Loader2 className="h-8 w-8 animate-spin text-gray-900 dark:text-white" />
-      </div>
-    )
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="flex h-[calc(100vh-4rem)] items-center justify-center bg-white dark:bg-gray-950">
+  //       <Loader2 className="h-8 w-8 animate-spin text-gray-900 dark:text-white" />
+  //     </div>
+  //   )
+  // }
 
-  if (!user) {
-    return (
-      <div className="flex h-[calc(100vh-4rem)] items-center justify-center bg-white dark:bg-gray-950">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Not Logged In</h2>
-          <p className="text-gray-600 dark:text-gray-400">Please log in to view your dashboard.</p>
-        </div>
-      </div>
-    )
-  }
+  // if (!user) {
+  //   return (
+  //     <div className="flex h-[calc(100vh-4rem)] items-center justify-center bg-white dark:bg-gray-950">
+  //       <div className="text-center">
+  //         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Not Logged In</h2>
+  //         <p className="text-gray-600 dark:text-gray-400">Please log in to view your dashboard.</p>
+  //       </div>
+  //     </div>
+  //   )
+  // }
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950">
@@ -146,7 +146,7 @@ export default function DashboardPage() {
             </BreadcrumbList>
           </Breadcrumb>
           <div>
-            <h1 className="text-3xl font-bold text-balance text-gray-900 dark:text-white">Welcome back, {user?.name || 'Creator'}</h1>
+            {/* <h1 className="text-3xl font-bold text-balance text-gray-900 dark:text-white">Welcome back, {user?.name || 'Creator'}</h1> */}
             <p className="text-gray-600 dark:text-gray-400 mt-1">Here's what's happening with your partnerships today.</p>
           </div>
         </div>

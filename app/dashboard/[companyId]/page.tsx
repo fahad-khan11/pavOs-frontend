@@ -1,92 +1,67 @@
-import { whopSdk } from "@/lib/whop-sdk";
+// app/dashboard/[companyId]/page.tsx
+import { whopsdk } from "@/lib/whop-sdk";
 import { headers } from "next/headers";
-import { WhopDashboardWrapper } from "./whop-dashboard-wrapper";
 
-interface PageProps {
-  params: Promise<{ companyId: string }>;
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-}
-
-export default async function WhopDashboardPage({ params, searchParams }: PageProps) {
-  const { companyId } = await params;
-  const search = await searchParams;
-  const headersList = await headers();
-
+export default async function WhopDashboardPage({
+  params,
+}: {
+  params: { companyId: string };
+}) {
+  const companyId = params.companyId;
+  
   try {
-    const devToken = search['whop-dev-user-token'] as string | undefined;
-    let userId: string;
-
-    if (devToken) {
-      const result = await whopSdk.verifyUserToken(devToken);
-      userId = result.userId;
-    } else {
-      const result = await whopSdk.verifyUserToken(headersList);
-      userId = result.userId;
+    // Get headers
+    const headersList = await headers();
+    const referer = headersList.get('referer');
+    
+    console.log('Referer URL:', referer);
+    
+    // Extract token from referer URL
+    let userToken: string | null = null;
+    
+    if (referer) {
+      // Parse the referer URL to get query params
+      const url = new URL(referer);
+      userToken = url.searchParams.get('whop-dev-user-token');
     }
-
-    // ✅ WHOP REQUIREMENT: Check if user has admin access to this company
-    const access = await whopSdk.users.checkAccess(
-      companyId,
-      { id: userId }
-    );
-
-    if (access.access_level !== "admin") {
-      return (
-        <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-950">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-red-600 dark:text-red-400 mb-4">Access Denied</h1>
-            <p className="text-gray-600 dark:text-gray-400">
-              Admin access required. Only team members can access this dashboard.
-            </p>
-          </div>
-        </div>
-      );
+    
+    console.log('Extracted token:', userToken ? 'Yes' : 'No');
+    
+    if (!userToken) {
+      // Also check direct headers (just in case)
+      userToken = headersList.get('x-whop-user-token');
     }
-
-    let userEmail: string | undefined = undefined;
-    let userName: string | undefined = undefined;
-
-    try {
-      const userDataResponse = await fetch(`https://api.whop.com/api/v2/me`, {
-        headers: {
-          'Authorization': `Bearer ${devToken || headersList.get('authorization')?.replace('Bearer ', '')}`,
-        },
-      });
-
-      if (userDataResponse.ok) {
-        const userData = await userDataResponse.json();
-        userEmail = userData.email;
-        userName = userData.username || userData.name || userData.email?.split('@')[0];
-      }
-    } catch (error) {
-      console.error("Error fetching Whop user data:", error);
+    
+    if (!userToken) {
+      throw new Error('No Whop user token found in referer or headers');
     }
-
+    
+    // Now verify the token
+    const { userId } = await whopsdk.verifyUserToken(userToken);
+    console.log('✅ Authenticated! User ID:', userId);
+    
+    // Fetch data
+    const [company, user, access] = await Promise.all([
+      whopsdk.companies.retrieveCompany({ companyId }),
+      whopsdk.apps.retrieveAuthenticatedUser({ userToken }),
+      whopsdk.apps.retrieveUserAccess({ userToken }),
+    ]);
+    
     return (
-      <WhopDashboardWrapper
-        whopUserId={userId}
-        whopCompanyId={companyId}
-        whopEmail={userEmail}
-        whopUsername={userName}
-      />
+      <div>
+        <h1>Welcome to {company.username}'s Dashboard</h1>
+        <p>User: {user.username}</p>
+        {/* Your dashboard content */}
+      </div>
     );
+    
   } catch (error) {
-    console.error("Whop authentication error:", error);
-
+    console.error('Authentication error:', error);
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-950">
-        <div className="text-center p-8">
-          <h1 className="text-2xl font-bold text-red-600 dark:text-red-400 mb-4">
-            Authentication Error
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mb-4">
-            Failed to verify your Whop session. Please make sure you're accessing
-            this app through the Whop dashboard.
-          </p>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            Error: {error instanceof Error ? error.message : "Unknown error"}
-          </p>
-        </div>
+      <div style={{ padding: '20px', color: 'red' }}>
+        <h1>Authentication Error</h1>
+        <p>{error instanceof Error ? error.message : "Unknown error"}</p>
+        <p>Token extracted from Referer URL</p>
       </div>
     );
   }

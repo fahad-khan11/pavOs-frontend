@@ -24,7 +24,7 @@ import {
   User,
   LogOut
 } from "lucide-react"
-import { useAuth } from "@/components/auth-provider"
+// import { useAuth } from "@/components/auth-provider"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -39,16 +39,16 @@ interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function Sidebar({ className }: SidebarProps) {
   const pathname = usePathname()
-  const { user } = useAuth()
+  // const { user } = useAuth()
   const router = useRouter()
   const [isCollapsed, setIsCollapsed] = React.useState(false)
 
   const navigation = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-    { name: "Leads", href: "/leads", icon: MessageSquare },
-    { name: "Pipeline", href: "/pipeline", icon: Kanban },
-    { name: "Contacts", href: "/contacts", icon: User },
-    { name: "Analytics", href: "/analytics", icon: BarChart3 },
+    // { name: "Leads", href: "/leads", icon: MessageSquare },
+    // { name: "Pipeline", href: "/pipeline", icon: Kanban },
+    // { name: "Contacts", href: "/contacts", icon: User },
+    // { name: "Analytics", href: "/analytics", icon: BarChart3 },
   ]
 
   return (
@@ -157,7 +157,7 @@ export function Sidebar({ className }: SidebarProps) {
                   </div> */}
                   {!isCollapsed && (
                     <div className="flex flex-col items-start truncate text-left">
-                       <span className="text-sm font-medium text-white truncate w-full">{user?.name}</span>
+                       {/* <span className="text-sm font-medium text-white truncate w-full">{user?.name}</span> */}
                     </div>
                   )}
               </Button>

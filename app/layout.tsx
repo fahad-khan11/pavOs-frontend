@@ -3,7 +3,7 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
-import { AuthProvider } from "@/components/auth-provider"
+// import { AuthProvider } from "@/components/auth-provider"
 import { ThemeProvider } from "@/components/theme-provider"
 import { WhopThemeSync } from "@/components/whop-theme-sync"
 import { WhopThemeWrapper } from "@/components/whop-theme-wrapper"
@@ -11,6 +11,7 @@ import { Toaster } from "react-hot-toast"
 import { WhopApp } from "@whop/react/components"
 import { Sidebar } from "@/components/sidebar"
 import { Navbar } from "@/components/navbar"
+import Providers from "./provides"
 
 
 const inter = Inter({ subsets: ["latin"] })
@@ -39,17 +40,19 @@ export default function RootLayout({
           <WhopThemeSync />
           <WhopApp accentColor="blue" appearance="inherit">
             <WhopThemeWrapper>
-              <AuthProvider>
+              {/* <AuthProvider> */}
                 <div className="flex h-screen overflow-hidden">
                   <div className="hidden md:block">
                     <Sidebar />
                   </div>
                   <main className="flex-1 overflow-auto">
+                   <Providers>
                     <Navbar />
                     {children}
+                   </Providers>
                   </main>
                 </div>
-              </AuthProvider>
+              {/* </AuthProvider> */}
             </WhopThemeWrapper>
           </WhopApp>
           <Toaster
