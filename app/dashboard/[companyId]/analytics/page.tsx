@@ -1,14 +1,13 @@
 "use client"
 
-import { useEffect, useState, useRef } from "react"
-import { useRouter } from "next/navigation"
-import { useAuth } from "@/components/auth-provider"
+import { useEffect, useState } from "react"
+import { useParams } from "next/navigation"
 import { useTheme } from "next-themes"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { DollarSign, TrendingUp, Users, Briefcase, Target, Calendar, ArrowUpRight, ArrowDownRight, Loader2 } from "lucide-react"
+import { DollarSign, TrendingUp, Briefcase, Target } from "lucide-react"
 import {
   Bar,
   BarChart,
@@ -21,11 +20,8 @@ import {
   YAxis,
   CartesianGrid,
   ResponsiveContainer,
-  Tooltip,
 } from "recharts"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import api from "@/lib/api"
-import toast from "react-hot-toast"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -35,56 +31,49 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 
-// Custom tick component for proper dark mode support
-const CustomTick = ({ x, y, payload, isDark }: any) => {
-  return (
-    <text 
-      x={x} 
-      y={y} 
-      dy={16} 
-      textAnchor="middle" 
-      fill={isDark ? "#ffffff" : "#0e1d3a"}
-      fontSize={12}
-    >
-      {payload.value}
-    </text>
-  )
-}
-
-const CustomYTick = ({ x, y, payload, isDark }: any) => {
-  return (
-    <text 
-      x={x} 
-      y={y} 
-      dx={-10} 
-      textAnchor="end" 
-      fill={isDark ? "#ffffff" : "#0e1d3a"}
-      fontSize={12}
-    >
-      {payload.value}
-    </text>
-  )
-}
-
-interface AnalyticsData {
-  totalRevenue: number
-  winRate: number
-  activeDeals: number
-  avgDealSize: number
-  totalLeads: number
-  wonLeads: number
-  lostLeads: number
-  sourceBreakdown: { [key: string]: { count: number; won: number; revenue: number } }
-  pipelineBreakdown: { [key: string]: { count: number; value: number } }
-  monthlyRevenue: { month: string; revenue: number; deals: number }[]
+// Static analytics data
+const staticAnalytics = {
+  totalRevenue: 485000,
+  winRate: 68,
+  activeDeals: 42,
+  avgDealSize: 12500,
+  totalLeads: 156,
+  wonLeads: 38,
+  lostLeads: 18,
+  sourceBreakdown: {
+    manual: { count: 67, won: 18, revenue: 225000 },
+    referral: { count: 45, won: 15, revenue: 187500 },
+    whop: { count: 32, won: 8, revenue: 100000 },
+    instagram: { count: 12, won: 2, revenue: 25000 },
+  },
+  pipelineBreakdown: {
+    new: { count: 24, value: 300000 },
+    in_conversation: { count: 18, value: 225000 },
+    proposal: { count: 12, value: 150000 },
+    negotiation: { count: 8, value: 100000 },
+    won: { count: 38, value: 485000 },
+    lost: { count: 18, value: 90000 },
+  },
+  monthlyRevenue: [
+    { month: "Aug", revenue: 45000, deals: 4 },
+    { month: "Sep", revenue: 62000, deals: 5 },
+    { month: "Oct", revenue: 78000, deals: 7 },
+    { month: "Nov", revenue: 95000, deals: 8 },
+    { month: "Dec", revenue: 102000, deals: 9 },
+    { month: "Jan", revenue: 103000, deals: 5 },
+  ],
 }
 
 export default function AnalyticsPage() {
-  const { user, isLoading } = useAuth()
-  const router = useRouter()
+  const params = useParams()
+  const companyId = params.companyId as string
+  
+  // Get token from URL for navigation
+  const searchParams = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null
+  const devToken = searchParams?.get("whop-dev-user-token")
+  const tokenQuery = devToken ? `?whop-dev-user-token=${devToken}` : ""
+  
   const [timeRange, setTimeRange] = useState("30")
-  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null)
-  const [loading, setLoading] = useState(true)
   const { resolvedTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   const isDarkMode = mounted && resolvedTheme === "dark"
@@ -93,104 +82,51 @@ export default function AnalyticsPage() {
     setMounted(true)
   }, [])
 
-  // Update chart colors for dark mode
-
-
-  useEffect(() => {
-    if (user) {
-      loadAnalytics()
-    }
-  }, [user, timeRange])
-
-  const loadAnalytics = async () => {
-    try {
-      setLoading(true)
-      const response = await api.get(`/dashboard/analytics?timeRange=${timeRange}`)
-      setAnalytics(response.data.data)
-    } catch (error: any) {
-      console.error('Failed to load analytics:', error)
-      toast.error(error.response?.data?.error || 'Failed to load analytics')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  if (isLoading || !user) {
-    return (
-      <div className="flex h-[calc(100vh-4rem)] items-center justify-center bg-white dark:bg-gray-950">
-        <Loader2 className="h-8 w-8 animate-spin text-gray-900 dark:text-white" />
-      </div>
-    )
-  }
-
-  if (loading) {
-    return (
-      <div className="flex h-[calc(100vh-4rem)] items-center justify-center bg-white dark:bg-gray-950">
-
-        <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-gray-900 dark:text-white" />
-          </div>
-        </main>
-      </div>
-    )
-  }
+  const analytics = staticAnalytics
 
   // Transform data for charts
-  const revenueData = analytics?.monthlyRevenue || []
-  
-  // Debug: Log the data
-  console.log('Revenue Data:', revenueData)
-  console.log('Is Dark Mode:', isDarkMode)
+  const revenueData = analytics.monthlyRevenue
 
-  const pipelineData = analytics?.pipelineBreakdown ? [
+  const pipelineData = [
     { stage: "New", value: analytics.pipelineBreakdown.new?.value || 0, count: analytics.pipelineBreakdown.new?.count || 0 },
     { stage: "In Conversation", value: analytics.pipelineBreakdown.in_conversation?.value || 0, count: analytics.pipelineBreakdown.in_conversation?.count || 0 },
     { stage: "Proposal", value: analytics.pipelineBreakdown.proposal?.value || 0, count: analytics.pipelineBreakdown.proposal?.count || 0 },
     { stage: "Negotiation", value: analytics.pipelineBreakdown.negotiation?.value || 0, count: analytics.pipelineBreakdown.negotiation?.count || 0 },
     { stage: "Won", value: analytics.pipelineBreakdown.won?.value || 0, count: analytics.pipelineBreakdown.won?.count || 0 },
     { stage: "Lost", value: analytics.pipelineBreakdown.lost?.value || 0, count: analytics.pipelineBreakdown.lost?.count || 0 },
-  ] : []
+  ]
 
   // Source breakdown for pie chart
-  const sourceData = analytics ? Object.entries(analytics.sourceBreakdown).map(([source, data], index) => ({
+  const sourceData = Object.entries(analytics.sourceBreakdown).map(([source, data], index) => ({
     name: source.charAt(0).toUpperCase() + source.slice(1),
     value: data.count,
     revenue: data.revenue,
     won: data.won,
     color: `hsl(var(--chart-${(index % 5) + 1}))`,
-  })).filter(s => s.value > 0) : []
+  })).filter(s => s.value > 0)
 
   const stats = [
     {
       title: "Total Revenue",
-      value: `$${(analytics?.totalRevenue || 0).toLocaleString()}`,
-      change: "",
-      trend: "up" as const,
+      value: `$${analytics.totalRevenue.toLocaleString()}`,
       icon: DollarSign,
-      description: `${analytics?.wonLeads || 0} won deals`,
+      description: `${analytics.wonLeads} won deals`,
     },
     {
       title: "Win Rate",
-      value: `${analytics?.winRate || 0}%`,
-      change: "",
-      trend: "up" as const,
+      value: `${analytics.winRate}%`,
       icon: Target,
-      description: `${analytics?.wonLeads || 0} of ${(analytics?.wonLeads || 0) + (analytics?.lostLeads || 0)} closed`,
+      description: `${analytics.wonLeads} of ${analytics.wonLeads + analytics.lostLeads} closed`,
     },
     {
       title: "Active Deals",
-      value: `${analytics?.activeDeals || 0}`,
-      change: "",
-      trend: "up" as const,
+      value: `${analytics.activeDeals}`,
       icon: Briefcase,
       description: "In pipeline",
     },
     {
       title: "Avg Deal Size",
-      value: `$${(analytics?.avgDealSize || 0).toLocaleString()}`,
-      change: "",
-      trend: "up" as const,
+      value: `$${analytics.avgDealSize.toLocaleString()}`,
       icon: TrendingUp,
       description: "Per deal",
     },
@@ -204,7 +140,7 @@ export default function AnalyticsPage() {
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+                <BreadcrumbLink href={`/dashboard/${companyId}${tokenQuery}`}>Dashboard</BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
@@ -241,7 +177,7 @@ export default function AnalyticsPage() {
                   <Icon className="h-4 w-4 text-gray-600 dark:text-gray-400" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stat.value}</div>
+                  <div className="text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</div>
                   <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">{stat.description}</p>
                 </CardContent>
               </Card>
@@ -251,9 +187,9 @@ export default function AnalyticsPage() {
 
         <Tabs defaultValue="revenue" className="space-y-6">
           <TabsList className="bg-white dark:bg-[#101828]">
-            <TabsTrigger value="revenue"  className="hover:bg-white dark:hover-bg-white/10 dark:hover-text-black">Revenue</TabsTrigger>
+            <TabsTrigger value="revenue" className="hover:bg-white dark:hover-bg-white/10 dark:hover-text-black">Revenue</TabsTrigger>
             <TabsTrigger value="pipeline" className="hover:bg-white dark:hover-bg-white/10 dark:hover-text-black">Pipeline</TabsTrigger>
-            <TabsTrigger value="sources"  className="hover:bg-white dark:hover-bg-white/10 dark:hover-text-black">Sources</TabsTrigger>
+            <TabsTrigger value="sources" className="hover:bg-white dark:hover-bg-white/10 dark:hover-text-black">Sources</TabsTrigger>
           </TabsList>
 
           <TabsContent value="revenue" className="space-y-6">
@@ -316,17 +252,14 @@ export default function AnalyticsPage() {
                     {revenueData.map((month) => (
                       <div key={month.month} className="flex items-center justify-between pb-4 border-b last:border-0">
                         <div>
-                          <p className="font-medium">{month.month}</p>
+                          <p className="font-medium text-gray-900 dark:text-white">{month.month}</p>
                           <p className="text-sm text-gray-600 dark:text-gray-400">{month.deals} deals</p>
                         </div>
                         <div className="text-right">
-                          <p className="font-semibold">${month.revenue.toLocaleString()}</p>
+                          <p className="font-semibold text-gray-900 dark:text-white">${month.revenue.toLocaleString()}</p>
                         </div>
                       </div>
                     ))}
-                    {revenueData.length === 0 && (
-                      <p className="text-center text-gray-600 dark:text-gray-400 py-4">No revenue data yet</p>
-                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -339,23 +272,23 @@ export default function AnalyticsPage() {
                 <CardContent className="space-y-4">
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600 dark:text-gray-400">Total Leads</span>
-                    <span className="font-semibold">{analytics?.totalLeads || 0}</span>
+                    <span className="font-semibold text-gray-900 dark:text-white">{analytics.totalLeads}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600 dark:text-gray-400">Won Deals</span>
-                    <span className="font-semibold">{analytics?.wonLeads || 0}</span>
+                    <span className="font-semibold text-gray-900 dark:text-white">{analytics.wonLeads}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600 dark:text-gray-400">Lost Deals</span>
-                    <span className="font-semibold">{analytics?.lostLeads || 0}</span>
+                    <span className="font-semibold text-gray-900 dark:text-white">{analytics.lostLeads}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600 dark:text-gray-400">Active in Pipeline</span>
-                    <span className="font-semibold">{analytics?.activeDeals || 0}</span>
+                    <span className="font-semibold text-gray-900 dark:text-white">{analytics.activeDeals}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600 dark:text-gray-400">Total Revenue</span>
-                    <span className="font-semibold">${(analytics?.totalRevenue || 0).toLocaleString()}</span>
+                    <span className="font-semibold text-gray-900 dark:text-white">${analytics.totalRevenue.toLocaleString()}</span>
                   </div>
                 </CardContent>
               </Card>
@@ -421,23 +354,23 @@ export default function AnalyticsPage() {
                 <CardContent className="space-y-4">
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600 dark:text-gray-400">Total Pipeline Value</span>
-                    <span className="font-semibold">
+                    <span className="font-semibold text-gray-900 dark:text-white">
                       ${pipelineData.reduce((sum, s) => sum + s.value, 0).toLocaleString()}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600 dark:text-gray-400">Total Leads in Pipeline</span>
-                    <span className="font-semibold">
+                    <span className="font-semibold text-gray-900 dark:text-white">
                       {pipelineData.reduce((sum, s) => sum + s.count, 0)}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600 dark:text-gray-400">Average Deal Size</span>
-                    <span className="font-semibold">${(analytics?.avgDealSize || 0).toLocaleString()}</span>
+                    <span className="font-semibold text-gray-900 dark:text-white">${analytics.avgDealSize.toLocaleString()}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600 dark:text-gray-400">Win Rate</span>
-                    <span className="font-semibold">{analytics?.winRate || 0}%</span>
+                    <span className="font-semibold text-gray-900 dark:text-white">{analytics.winRate}%</span>
                   </div>
                 </CardContent>
               </Card>
@@ -453,7 +386,7 @@ export default function AnalyticsPage() {
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-gray-600 dark:text-gray-400">{stage.stage}</span>
                         <div className="text-right">
-                          <span className="font-medium">{stage.count} leads</span>
+                          <span className="font-medium text-gray-900 dark:text-white">{stage.count} leads</span>
                           {stage.value > 0 && (
                             <span className="text-gray-600 dark:text-gray-400 ml-2">(${stage.value.toLocaleString()})</span>
                           )}
@@ -463,7 +396,7 @@ export default function AnalyticsPage() {
                         <div
                           className="h-full bg-primary"
                           style={{
-                            width: `${Math.min(100, (stage.count / Math.max(1, analytics?.totalLeads || 1)) * 100)}%`
+                            width: `${Math.min(100, (stage.count / Math.max(1, analytics.totalLeads)) * 100)}%`
                           }}
                         />
                       </div>
@@ -482,44 +415,37 @@ export default function AnalyticsPage() {
                   <CardDescription>Distribution of leads by source</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {sourceData.length > 0 ? (
-                    <ChartContainer
-                      config={{
-                        discord: { label: "Discord", color: "hsl(var(--chart-1))" },
-                        manual: { label: "Manual", color: "hsl(var(--chart-2))" },
-                        whop: { label: "Whop", color: "hsl(var(--chart-3))" },
-                        referral: { label: "Referral", color: "hsl(var(--chart-4))" },
-                        instagram: { label: "Instagram", color: "hsl(var(--chart-5))" },
-                      }}
-                      className="h-[300px] [&_text]:fill-foreground"
-                    >
-                      <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                          <Pie
-                            data={sourceData}
-                            cx="50%"
-                            cy="50%"
-                            labelLine={false}
-                            label={(entry: any) => 
-                              `${entry.name} ${((entry.percent || 0) * 100).toFixed(0)}%`
-                            }
-                            outerRadius={80}
-                            fill="#8884d8"
-                            dataKey="value"
-                          >
-                            {sourceData.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={entry.color} />
-                            ))}
-                          </Pie>
-                          <ChartTooltip content={<ChartTooltipContent />} />
-                        </PieChart>
-                      </ResponsiveContainer>
-                    </ChartContainer>
-                  ) : (
-                    <div className="flex items-center justify-center h-[300px] text-gray-600 dark:text-gray-400">
-                      No lead data yet
-                    </div>
-                  )}
+                  <ChartContainer
+                    config={{
+                      manual: { label: "Manual", color: "hsl(var(--chart-1))" },
+                      referral: { label: "Referral", color: "hsl(var(--chart-2))" },
+                      whop: { label: "Whop", color: "hsl(var(--chart-3))" },
+                      instagram: { label: "Instagram", color: "hsl(var(--chart-4))" },
+                    }}
+                    className="h-[300px] [&_text]:fill-foreground"
+                  >
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={sourceData}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={false}
+                          label={(entry: any) => 
+                            `${entry.name} ${((entry.percent || 0) * 100).toFixed(0)}%`
+                          }
+                          outerRadius={80}
+                          fill="#8884d8"
+                          dataKey="value"
+                        >
+                          {sourceData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                        </Pie>
+                        <ChartTooltip content={<ChartTooltipContent />} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </ChartContainer>
                 </CardContent>
               </Card>
 
@@ -533,22 +459,19 @@ export default function AnalyticsPage() {
                     {sourceData.map((source) => (
                       <div key={source.name} className="flex items-center justify-between pb-4 border-b last:border-0">
                         <div>
-                          <p className="font-medium capitalize">{source.name}</p>
+                          <p className="font-medium capitalize text-gray-900 dark:text-white">{source.name}</p>
                           <p className="text-sm text-gray-600 dark:text-gray-400">
                             {source.value} leads, {source.won} won
                           </p>
                         </div>
                         <div className="text-right">
-                          <p className="font-semibold">${source.revenue.toLocaleString()}</p>
+                          <p className="font-semibold text-gray-900 dark:text-white">${source.revenue.toLocaleString()}</p>
                           <p className="text-sm text-gray-600 dark:text-gray-400">
                             {source.value > 0 ? Math.round((source.won / source.value) * 100) : 0}% win rate
                           </p>
                         </div>
                       </div>
                     ))}
-                    {sourceData.length === 0 && (
-                      <p className="text-center text-gray-600 dark:text-gray-400 py-4">No source data yet</p>
-                    )}
                   </div>
                 </CardContent>
               </Card>

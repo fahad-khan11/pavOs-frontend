@@ -18,6 +18,7 @@ import { useRouter } from "next/navigation"
 import { LayoutDashboard, Users, Kanban, BarChart3, User, Settings, MessageSquare, Menu } from "lucide-react"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { useState } from "react"
+import { useAppSelector } from "@/lib/redux"
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -32,6 +33,14 @@ export function Navbar() {
   // const { user } = useAuth()
   const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
+  const { user, company, access, isLoaded } = useAppSelector((state) => state.whop)
+  const companyId = company?.id || ""
+  
+  // Get token from URL for navigation
+  const searchParams = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null
+  const devToken = searchParams?.get("whop-dev-user-token")
+  const tokenQuery = devToken ? `?whop-dev-user-token=${devToken}` : ""
+
 
   return (
     <nav className="border-b bg-white dark:bg-[#101828] shadow-md dark:shadow-none border-gray-200 dark:border-gray-800 relative z-10">
@@ -79,7 +88,7 @@ export function Navbar() {
                                 )}
                               >
                                 <Icon className="h-4 w-4" />
-                                {item.name}
+                                {user?.name?.charAt(0).toUpperCase()}
                               </Button>
                             </Link>
                           )
@@ -106,12 +115,15 @@ export function Navbar() {
           </div>
 
           <div className="flex items-center gap-2">
+              <span className="text-sm font-semibold text-[#0e1d3] dark:text-white">
+                      {user?.name}
+              </span>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="gap-2 text-gray-900 hover:bg-gray-100 px-2 sm:px-4">
                   <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center">
-                    <span className="text-sm font-semibold text-[#0e1d3a] dark:text-[#0e1d3a]">
-                      {/* {user?.name?.charAt(0).toUpperCase()} */}
+                    <span className="text-sm font-semibold text-[#0e1d3a] dark:text-[#0e1d3]">
+                      {user?.name?.charAt(0).toUpperCase()}
                     </span>
                   </div>
                   {/* <span className="hidden sm:inline text-gray-900 dark:text-white">{user?.name}</span> */}
@@ -121,7 +133,7 @@ export function Navbar() {
               <DropdownMenuLabel className="text-gray-900 dark:text-white">My Account</DropdownMenuLabel>
               <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-800" />
               <DropdownMenuItem 
-                onClick={() => router.push('/settings/profile')} 
+                onClick={() => router.push(companyId ? `/dashboard/${companyId}/profile${tokenQuery}` : '/profile')} 
                 className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
               >
                 <User className="mr-2 h-4 w-4" />

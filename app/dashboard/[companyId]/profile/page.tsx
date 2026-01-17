@@ -1,6 +1,6 @@
 "use client"
 
-// import { useAuth } from "@/components/auth-provider"
+import { useParams } from "next/navigation"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -9,19 +9,16 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
-import { Loader2 } from "lucide-react"
 import { WhopProfileCard } from "@/components/whop-profile-card"
 
 export default function ProfilePage() {
-  // const { isLoading: authLoading } = useAuth()
-
-  // if (authLoading) {
-  //   return (
-  //     <div className="flex h-[calc(100vh-4rem)] items-center justify-center bg-background">
-  //       <Loader2 className="h-8 w-8 animate-spin text-foreground" />
-  //     </div>
-  //   )
-  // }
+  const params = useParams()
+  const companyId = params.companyId as string
+  
+  // Get token from URL for navigation
+  const searchParams = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null
+  const devToken = searchParams?.get("whop-dev-user-token")
+  const tokenQuery = devToken ? `?whop-dev-user-token=${devToken}` : ""
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950">
@@ -31,7 +28,7 @@ export default function ProfilePage() {
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BreadcrumbLink href="/dashboard" className="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">Dashboard</BreadcrumbLink>
+                <BreadcrumbLink href={`/dashboard/${companyId}${tokenQuery}`} className="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">Dashboard</BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator className="text-gray-400 dark:text-gray-600" />
               <BreadcrumbItem>
@@ -54,6 +51,3 @@ export default function ProfilePage() {
     </div>
   )
 }
-
-
-

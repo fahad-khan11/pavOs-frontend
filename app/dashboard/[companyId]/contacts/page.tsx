@@ -1,8 +1,7 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { useAuth } from "@/components/auth-provider"
+import { useState } from "react"
+import { useRouter, useParams } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -24,12 +23,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Plus, Search, MoreVertical, Mail, Phone, Building2, Calendar, Filter, Loader2 } from "lucide-react"
-import { ContactForm } from "@/components/contact-form"
-import { ContactDetail } from "@/components/contact-detail"
-import { EmailComposer, type EmailData } from "@/components/email-composer"
-import type { Contact } from "@/lib/types"
-import { contactService } from "@/lib/services"
+import { Plus, Search, MoreVertical, Mail, Phone, Building2, Calendar, Filter } from "lucide-react"
 import toast from "react-hot-toast"
 import {
   Breadcrumb,
@@ -40,92 +34,136 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 
+interface Contact {
+  id: string
+  name: string
+  email: string
+  phone: string
+  company: string
+  position: string
+  status: "active" | "prospect" | "inactive"
+  lastContact: string
+  deals: number
+  totalValue: number
+  tags: string[]
+  notes?: string
+}
+
+// Static contacts data
+const staticContacts: Contact[] = [
+  {
+    id: "1",
+    name: "Sarah Johnson",
+    email: "sarah.johnson@techcorp.com",
+    phone: "+1 (555) 123-4567",
+    company: "TechCorp Inc.",
+    position: "Marketing Director",
+    status: "active",
+    lastContact: new Date(Date.now() - 2 * 24 * 3600000).toISOString(),
+    deals: 3,
+    totalValue: 45000,
+    tags: ["enterprise", "tech"],
+  },
+  {
+    id: "2",
+    name: "Michael Chen",
+    email: "m.chen@innovate.io",
+    phone: "+1 (555) 234-5678",
+    company: "Innovate.io",
+    position: "CEO",
+    status: "active",
+    lastContact: new Date(Date.now() - 5 * 24 * 3600000).toISOString(),
+    deals: 5,
+    totalValue: 120000,
+    tags: ["startup", "high-value"],
+  },
+  {
+    id: "3",
+    name: "Emily Davis",
+    email: "emily@creativestudio.com",
+    phone: "+1 (555) 345-6789",
+    company: "Creative Studio",
+    position: "Creative Director",
+    status: "prospect",
+    lastContact: new Date(Date.now() - 10 * 24 * 3600000).toISOString(),
+    deals: 0,
+    totalValue: 0,
+    tags: ["agency", "creative"],
+  },
+  {
+    id: "4",
+    name: "James Wilson",
+    email: "j.wilson@globalretail.com",
+    phone: "+1 (555) 456-7890",
+    company: "Global Retail Co.",
+    position: "VP of Sales",
+    status: "active",
+    lastContact: new Date(Date.now() - 1 * 24 * 3600000).toISOString(),
+    deals: 8,
+    totalValue: 250000,
+    tags: ["retail", "enterprise"],
+  },
+  {
+    id: "5",
+    name: "Amanda Martinez",
+    email: "amanda@startuplab.co",
+    phone: "+1 (555) 567-8901",
+    company: "Startup Lab",
+    position: "Founder",
+    status: "prospect",
+    lastContact: new Date(Date.now() - 14 * 24 * 3600000).toISOString(),
+    deals: 1,
+    totalValue: 15000,
+    tags: ["startup"],
+  },
+  {
+    id: "6",
+    name: "Robert Taylor",
+    email: "rtaylor@oldclient.com",
+    phone: "+1 (555) 678-9012",
+    company: "Old Client LLC",
+    position: "Operations Manager",
+    status: "inactive",
+    lastContact: new Date(Date.now() - 90 * 24 * 3600000).toISOString(),
+    deals: 2,
+    totalValue: 30000,
+    tags: ["legacy"],
+  },
+]
+
 export default function ContactsPage() {
-  const { user, isLoading: authLoading } = useAuth()
   const router = useRouter()
-  const [contacts, setContacts] = useState<Contact[]>([])
-  const [loading, setLoading] = useState(true)
+  const params = useParams()
+  const companyId = params.companyId as string
+  
+  // Get token from URL for navigation
+  const searchParams = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null
+  const devToken = searchParams?.get("whop-dev-user-token")
+  const tokenQuery = devToken ? `?whop-dev-user-token=${devToken}` : ""
+  
+  const [contacts, setContacts] = useState<Contact[]>(staticContacts)
   const [searchQuery, setSearchQuery] = useState("")
   const [filterStatus, setFilterStatus] = useState<string>("all")
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null)
-  const [emailContact, setEmailContact] = useState<Contact | null>(null)
 
-  useEffect(() => {
-    if (!authLoading && !user) {
-      router.push("/dashboard")
-    }
-  }, [user, authLoading, router])
-
-  // Load contacts from backend
-  useEffect(() => {
-    if (user) {
-      loadContacts()
-    }
-  }, [user, searchQuery, filterStatus])
-
-  const loadContacts = async () => {
-    try {
-      setLoading(true)
-      const response = await contactService.getAll({
-        search: searchQuery || undefined,
-        status: filterStatus === 'all' ? undefined : filterStatus as any,
-      })
-      setContacts(response.data)
-    } catch (error: any) {
-      console.error('Failed to load contacts:', error)
-      toast.error(error.response?.data?.error || 'Failed to load contacts')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleAddContact = async (newContact: Omit<Contact, "id" | "deals" | "totalValue">) => {
-    try {
-      const contact = await contactService.create(newContact)
-      setContacts([contact, ...contacts])
-      setIsAddDialogOpen(false)
-      toast.success("Contact added successfully!")
-    } catch (error: any) {
-      console.error('Failed to add contact:', error)
-      toast.error(error.response?.data?.error || 'Failed to add contact')
-    }
-  }
-
-  const handleUpdateContact = async (contactId: string, updates: Partial<Contact>) => {
-    try {
-      const updatedContact = await contactService.update(contactId, updates)
-      setContacts(contacts.map((c) => (c.id === contactId ? updatedContact : c)))
-      setSelectedContact(null)
-      toast.success("Contact updated successfully!")
-    } catch (error: any) {
-      console.error('Failed to update contact:', error)
-      toast.error(error.response?.data?.error || 'Failed to update contact')
-    }
-  }
-
-  const handleDeleteContact = async (contactId: string) => {
+  const handleDeleteContact = (contactId: string) => {
     if (!confirm("Are you sure you want to delete this contact?")) return
-
-    try {
-      await contactService.delete(contactId)
-      setContacts(contacts.filter((c) => c.id !== contactId))
-      setSelectedContact(null)
-      toast.success("Contact deleted successfully!")
-    } catch (error: any) {
-      console.error('Failed to delete contact:', error)
-      toast.error(error.response?.data?.error || 'Failed to delete contact')
-    }
+    setContacts(contacts.filter((c) => c.id !== contactId))
+    setSelectedContact(null)
+    toast.success("Contact deleted successfully!")
   }
 
-  const handleSendEmail = (emailData: EmailData) => {
-    // TODO: Implement email sending in Phase 3
-    console.log("Sending email:", emailData)
-    toast.success("Email sent successfully!")
-    setEmailContact(null)
-  }
+  const filteredContacts = contacts.filter((contact) => {
+    const matchesSearch =
+      contact.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      contact.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      contact.company.toLowerCase().includes(searchQuery.toLowerCase())
 
-  const filteredContacts = contacts
+    const matchesStatus = filterStatus === "all" || contact.status === filterStatus
+
+    return matchesSearch && matchesStatus
+  })
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -140,18 +178,6 @@ export default function ContactsPage() {
     }
   }
 
-  if (authLoading) {
-    return (
-      <div className="flex h-[calc(100vh-4rem)] items-center justify-center bg-white dark:bg-gray-950">
-        <Loader2 className="h-8 w-8 animate-spin text-gray-900 dark:text-white" />
-      </div>
-    )
-  }
-
-  if (!user) {
-    return null
-  }
-
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950 p-8">
 
@@ -161,7 +187,7 @@ export default function ContactsPage() {
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+                <BreadcrumbLink href={`/dashboard/${companyId}${tokenQuery}`}>Dashboard</BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
@@ -186,7 +212,9 @@ export default function ContactsPage() {
                   <DialogTitle className="text-gray-900 dark:text-white">Add New Contact</DialogTitle>
                   <DialogDescription className="text-gray-600 dark:text-gray-400">Add a new brand contact to your CRM.</DialogDescription>
                 </DialogHeader>
-                <ContactForm onSubmit={handleAddContact} onCancel={() => setIsAddDialogOpen(false)} />
+                <div className="py-4 text-center text-gray-600 dark:text-gray-400">
+                  Contact form coming soon...
+                </div>
               </DialogContent>
             </Dialog>
           </div>
@@ -226,11 +254,7 @@ export default function ContactsPage() {
         </Card>
 
         {/* Contacts Grid */}
-        {loading ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-white" />
-          </div>
-        ) : filteredContacts.length === 0 ? (
+        {filteredContacts.length === 0 ? (
           <Card>
             <CardContent className="py-12 text-center">
               <p className="text-gray-600 dark:text-gray-400">No contacts found. Add your first contact to get started!</p>
@@ -256,11 +280,11 @@ export default function ContactsPage() {
                           <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
+                      <DropdownMenuContent align="end" className="bg-white dark:bg-[#101828]">
                         <DropdownMenuItem onClick={() => setSelectedContact(contact)}>
                           View Details
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setEmailContact(contact)}>
+                        <DropdownMenuItem onClick={() => toast.success("Email feature coming soon!")}>
                           <Mail className="mr-2 h-4 w-4" />
                           Send Email
                         </DropdownMenuItem>
@@ -300,11 +324,11 @@ export default function ContactsPage() {
                   <div className="pt-2 border-t">
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600 dark:text-gray-400">Deals:</span>
-                      <span className="font-semibold">{contact.deals}</span>
+                      <span className="font-semibold text-gray-900 dark:text-white">{contact.deals}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600 dark:text-gray-400">Total Value:</span>
-                      <span className="font-semibold">${contact.totalValue.toLocaleString()}</span>
+                      <span className="font-semibold text-gray-900 dark:text-white">${contact.totalValue.toLocaleString()}</span>
                     </div>
                   </div>
                   {contact.tags.length > 0 && (
@@ -324,27 +348,54 @@ export default function ContactsPage() {
 
         {/* Contact Detail Dialog */}
         {selectedContact && (
-          <ContactDetail
-            contact={selectedContact}
-            onClose={() => setSelectedContact(null)}
-            onUpdate={(updates) => handleUpdateContact(selectedContact.id, updates)}
-            onDelete={() => handleDeleteContact(selectedContact.id)}
-          />
-        )}
-
-        {/* Email Composer Dialog */}
-        {emailContact && (
-          <Dialog open={!!emailContact} onOpenChange={() => setEmailContact(null)}>
-            <DialogContent className="max-w-3xl">
+          <Dialog open={!!selectedContact} onOpenChange={() => setSelectedContact(null)}>
+            <DialogContent className="max-w-2xl bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800">
               <DialogHeader>
-                <DialogTitle>Send Email to {emailContact.name}</DialogTitle>
-                <DialogDescription>Compose and send an email to {emailContact.email}</DialogDescription>
+                <DialogTitle className="text-gray-900 dark:text-white">{selectedContact.name}</DialogTitle>
+                <DialogDescription className="text-gray-600 dark:text-gray-400">
+                  {selectedContact.position} at {selectedContact.company}
+                </DialogDescription>
               </DialogHeader>
-              <EmailComposer
-                to={emailContact.email}
-                onSend={handleSendEmail}
-                onCancel={() => setEmailContact(null)}
-              />
+              <div className="space-y-4 py-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Email</p>
+                    <p className="font-medium text-gray-900 dark:text-white">{selectedContact.email}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Phone</p>
+                    <p className="font-medium text-gray-900 dark:text-white">{selectedContact.phone}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Status</p>
+                    <Badge className={getStatusColor(selectedContact.status)}>{selectedContact.status}</Badge>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Last Contact</p>
+                    <p className="font-medium text-gray-900 dark:text-white">{new Date(selectedContact.lastContact).toLocaleDateString()}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Total Deals</p>
+                    <p className="font-medium text-gray-900 dark:text-white">{selectedContact.deals}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Total Value</p>
+                    <p className="font-medium text-gray-900 dark:text-white">${selectedContact.totalValue.toLocaleString()}</p>
+                  </div>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Tags</p>
+                  <div className="flex flex-wrap gap-1">
+                    {selectedContact.tags.map((tag, index) => (
+                      <Badge key={index} variant="outline">{tag}</Badge>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={() => setSelectedContact(null)}>Close</Button>
+                <Button variant="destructive" onClick={() => handleDeleteContact(selectedContact.id)}>Delete</Button>
+              </div>
             </DialogContent>
           </Dialog>
         )}

@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useState } from "react"
+import { useRouter, useParams } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -21,11 +21,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Skeleton } from "@/components/ui/skeleton"
-import { discordService } from "@/lib/services/discordService"
-import { Search, MessageSquare, UserPlus, Filter, ArrowLeft } from "lucide-react"
-import toast from "react-hot-toast"
+import { Search, MessageSquare, UserPlus, Filter } from "lucide-react"
 import { format } from "date-fns"
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
 
 type LeadStatus = "new" | "in_conversation" | "proposal" | "negotiation" | "won" | "lost"
 type LeadSource = "discord" | "instagram" | "tiktok" | "whop" | "manual" | "referral"
@@ -87,49 +92,115 @@ const sourceIcons: Record<LeadSource, string> = {
   referral: "🤝",
 }
 
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
+// Static data
+const staticLeads: Lead[] = [
+  {
+    id: "1",
+    name: "John Smith",
+    email: "john.smith@example.com",
+    phone: "+1 234 567 890",
+    source: "manual",
+    status: "new",
+    tags: ["high-value", "enterprise"],
+    lastContactDate: new Date(Date.now() - 2 * 24 * 3600000).toISOString(),
+    createdAt: new Date(Date.now() - 5 * 24 * 3600000).toISOString(),
+    updatedAt: new Date(Date.now() - 2 * 24 * 3600000).toISOString(),
+  },
+  {
+    id: "2",
+    name: "Sarah Johnson",
+    email: "sarah.j@startup.io",
+    source: "referral",
+    status: "in_conversation",
+    tags: ["startup", "tech"],
+    lastContactDate: new Date(Date.now() - 1 * 24 * 3600000).toISOString(),
+    createdAt: new Date(Date.now() - 7 * 24 * 3600000).toISOString(),
+    updatedAt: new Date(Date.now() - 1 * 24 * 3600000).toISOString(),
+    unreadCount: 3,
+  },
+  {
+    id: "3",
+    name: "Michael Chen",
+    email: "m.chen@company.com",
+    phone: "+1 555 123 456",
+    source: "whop",
+    status: "proposal",
+    tags: ["saas", "b2b"],
+    estimatedValue: 15000,
+    lastContactDate: new Date(Date.now() - 3 * 24 * 3600000).toISOString(),
+    createdAt: new Date(Date.now() - 14 * 24 * 3600000).toISOString(),
+    updatedAt: new Date(Date.now() - 3 * 24 * 3600000).toISOString(),
+  },
+  {
+    id: "4",
+    name: "Emily Davis",
+    email: "emily@creative.co",
+    source: "manual",
+    status: "negotiation",
+    tags: ["agency", "creative"],
+    estimatedValue: 8500,
+    lastContactDate: new Date(Date.now() - 12 * 3600000).toISOString(),
+    createdAt: new Date(Date.now() - 21 * 24 * 3600000).toISOString(),
+    updatedAt: new Date(Date.now() - 12 * 3600000).toISOString(),
+  },
+  {
+    id: "5",
+    name: "Alex Thompson",
+    email: "alex.t@ecommerce.shop",
+    source: "referral",
+    status: "won",
+    tags: ["ecommerce", "retail"],
+    estimatedValue: 25000,
+    lastContactDate: new Date(Date.now() - 7 * 24 * 3600000).toISOString(),
+    createdAt: new Date(Date.now() - 30 * 24 * 3600000).toISOString(),
+    updatedAt: new Date(Date.now() - 7 * 24 * 3600000).toISOString(),
+  },
+  {
+    id: "6",
+    name: "Jessica Lee",
+    email: "jlee@startup.io",
+    source: "manual",
+    status: "lost",
+    tags: ["budget"],
+    lastContactDate: new Date(Date.now() - 14 * 24 * 3600000).toISOString(),
+    createdAt: new Date(Date.now() - 45 * 24 * 3600000).toISOString(),
+    updatedAt: new Date(Date.now() - 14 * 24 * 3600000).toISOString(),
+  },
+]
+
+const staticStats: LeadStats = {
+  total: 156,
+  new: 24,
+  in_conversation: 38,
+  proposal: 21,
+  negotiation: 15,
+  won: 43,
+  lost: 15,
+  bySource: {
+    discord: 0,
+    instagram: 12,
+    tiktok: 8,
+    whop: 45,
+    manual: 67,
+    referral: 24,
+  },
+}
 
 export default function LeadsPage() {
   const router = useRouter()
-  const [leads, setLeads] = useState<Lead[]>([])
-  const [stats, setStats] = useState<LeadStats | null>(null)
-  const [loading, setLoading] = useState(true)
+  const params = useParams()
+  const companyId = params.companyId as string
+  
+  // Get token from URL for navigation
+  const searchParams = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null
+  const devToken = searchParams?.get("whop-dev-user-token")
+  const tokenQuery = devToken ? `?whop-dev-user-token=${devToken}` : ""
+  
+  const [leads] = useState<Lead[]>(staticLeads)
+  const [stats] = useState<LeadStats>(staticStats)
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState<LeadStatus | "all">("all")
   const [sourceFilter, setSourceFilter] = useState<LeadSource | "all">("all")
-
-  useEffect(() => {
-    loadLeads()
-    loadStats()
-  }, [])
-
-  const loadLeads = async () => {
-    try {
-      setLoading(true)
-      const data = await discordService.getLeads()
-      setLeads(data.leads || [])
-    } catch (error: any) {
-      toast.error(error.message || "Failed to load leads")
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const loadStats = async () => {
-    try {
-      const data = await discordService.getLeadStats()
-      setStats(data)
-    } catch (error: any) {
-      console.error("Failed to load stats:", error)
-    }
-  }
 
   const filteredLeads = leads.filter((lead) => {
     const matchesSearch =
@@ -151,7 +222,7 @@ export default function LeadsPage() {
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+                <BreadcrumbLink href={`/dashboard/${companyId}${tokenQuery}`}>Dashboard</BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
@@ -163,11 +234,10 @@ export default function LeadsPage() {
             <div>
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Leads</h1>
               <p className="text-gray-600 dark:text-gray-400 mt-1">
-                Manage your leads  .
-                {/* through discord and other sources. */}
+                Manage your leads.
               </p>
             </div>
-            <Button onClick={() => router.push("/leads/new")} variant="outline">
+            <Button onClick={() => router.push(`/dashboard/${companyId}/leads/new${tokenQuery}`)} variant="outline">
               <UserPlus className="h-4 w-4 mr-2" />
               Add Lead
             </Button>
@@ -175,58 +245,56 @@ export default function LeadsPage() {
         </div>
 
         {/* Stats Cards */}
-        {stats && (
-          <div className="grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
-            <Card>
-              <CardHeader className="pb-2">
-                <CardDescription className="truncate">Total Leads</CardDescription>
-                <CardTitle className="text-2xl">{stats.total - ((stats as any).discord ?? 0)}</CardTitle>
-              </CardHeader>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardDescription className="truncate">New</CardDescription>
-                <CardTitle className="text-2xl flex items-center justify-between">
-                  {stats.new - ((stats as any).discord_new ?? 0)}
-                  <Badge className={statusColors.new}>New</Badge>
-                </CardTitle>
-              </CardHeader>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardDescription className="truncate" title="In Conversation">In Conversation</CardDescription>
-                <CardTitle className="text-2xl flex items-center justify-between">
-                  {stats.in_conversation - ((stats as any).discord_in_conversation ?? 0)}
-                  <Badge className={statusColors.in_conversation}>Active</Badge>
-                </CardTitle>
-              </CardHeader>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardDescription className="truncate">Proposal</CardDescription>
-                <CardTitle className="text-2xl flex items-center justify-between">
-                  {stats.proposal -((stats as any).discord ?? 0)}
-                  <Badge className={statusColors.proposal}>Proposal</Badge>
-                </CardTitle>
-              </CardHeader>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardDescription className="truncate">Won</CardDescription>
-                <CardTitle className="text-2xl flex items-center justify-between">
-                  {stats.won - ((stats as any).discord_won ?? 0)}
-                  <Badge className={statusColors.won}>Won</Badge>
-                </CardTitle>
-              </CardHeader>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardDescription className="truncate">Lost</CardDescription>
-                <CardTitle className="text-2xl">{stats.lost - ((stats as any).discord ?? 0)}</CardTitle>
-              </CardHeader>
-            </Card>
-          </div>
-        )}
+        <div className="grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardDescription className="truncate">Total Leads</CardDescription>
+              <CardTitle className="text-2xl">{stats.total}</CardTitle>
+            </CardHeader>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardDescription className="truncate">New</CardDescription>
+              <CardTitle className="text-2xl flex items-center justify-between">
+                {stats.new}
+                <Badge className={statusColors.new}>New</Badge>
+              </CardTitle>
+            </CardHeader>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardDescription className="truncate" title="In Conversation">In Conversation</CardDescription>
+              <CardTitle className="text-2xl flex items-center justify-between">
+                {stats.in_conversation}
+                <Badge className={statusColors.in_conversation}>Active</Badge>
+              </CardTitle>
+            </CardHeader>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardDescription className="truncate">Proposal</CardDescription>
+              <CardTitle className="text-2xl flex items-center justify-between">
+                {stats.proposal}
+                <Badge className={statusColors.proposal}>Proposal</Badge>
+              </CardTitle>
+            </CardHeader>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardDescription className="truncate">Won</CardDescription>
+              <CardTitle className="text-2xl flex items-center justify-between">
+                {stats.won}
+                <Badge className={statusColors.won}>Won</Badge>
+              </CardTitle>
+            </CardHeader>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardDescription className="truncate">Lost</CardDescription>
+              <CardTitle className="text-2xl">{stats.lost}</CardTitle>
+            </CardHeader>
+          </Card>
+        </div>
 
         {/* Filters */}
         <Card>
@@ -268,12 +336,9 @@ export default function LeadsPage() {
               </SelectTrigger>
               <SelectContent className="bg-white dark:bg-[#101828]">
                 <SelectItem value="all">All Sources</SelectItem>
-                {/* <SelectItem value="discord">Discord</SelectItem> */}
-                {/* <SelectItem value="instagram">Instagram</SelectItem>
-                <SelectItem value="tiktok">TikTok</SelectItem>
-                <SelectItem value="whop">Whop</SelectItem> */}
                 <SelectItem value="manual">Manual</SelectItem>
-                {/* <SelectItem value="referral">Referral</SelectItem> */}
+                <SelectItem value="referral">Referral</SelectItem>
+                <SelectItem value="whop">Whop</SelectItem>
               </SelectContent>
             </Select>
           </CardContent>
@@ -288,20 +353,14 @@ export default function LeadsPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {loading ? (
-              <div className="space-y-4">
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <Skeleton key={i} className="h-16 w-full" />
-                ))}
-              </div>
-            ) : filteredLeads.length === 0 ? (
+            {filteredLeads.length === 0 ? (
               <div className="text-center py-12">
                 <MessageSquare className="h-12 w-12 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-white">No leads found</h3>
                 <p className="text-gray-600 dark:text-gray-400 mb-4">
                   {searchQuery || statusFilter !== "all" || sourceFilter !== "all"
                     ? "Try adjusting your filters"
-                    : "Start by connecting Discord or adding leads manually"}
+                    : "Start by adding leads manually"}
                 </p>
               </div>
             ) : (
@@ -319,9 +378,7 @@ export default function LeadsPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                   {filteredLeads
-                    .filter((lead) => lead.source !== "discord") // TEMP: hide discord leads
-                    .map((lead) => (
+                   {filteredLeads.map((lead) => (
                       <TableRow
                         key={lead.id}
                         className="cursor-pointer"

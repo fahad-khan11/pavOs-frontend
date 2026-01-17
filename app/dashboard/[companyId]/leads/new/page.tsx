@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useParams } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -13,8 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { discordService } from "@/lib/services/discordService"
-import { ArrowLeft, UserPlus, Save } from "lucide-react"
+import { Save } from "lucide-react"
 import toast from "react-hot-toast"
 import {
   Breadcrumb,
@@ -24,12 +23,20 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
+import { useAppSelector } from "@/lib/redux/hook"
 
 type LeadSource = "discord" | "instagram" | "tiktok" | "whop" | "manual" | "referral"
 type LeadStatus = "new" | "in_conversation" | "proposal" | "negotiation" | "won" | "lost"
 
 export default function NewLeadPage() {
   const router = useRouter()
+  const params = useParams()
+  const companyId = params.companyId as string
+  
+  // Get token from Redux for navigation
+  const token = useAppSelector((state) => state.whop.token)
+  const tokenQuery = token ? `?whop-dev-user-token=${token}` : ""
+  
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
@@ -62,39 +69,11 @@ export default function NewLeadPage() {
     try {
       setLoading(true)
       
-      // Process tags
-      const tags = formData.tags
-        .split(",")
-        .map((tag) => tag.trim())
-        .filter((tag) => tag.length > 0)
-
-      // Prepare lead data
-      const leadData: any = {
-        name: formData.name.trim(),
-        source: formData.source,
-        status: formData.status,
-        tags,
-      }
-
-      // Add optional fields if provided
-      if (formData.email.trim()) leadData.email = formData.email.trim()
-      if (formData.phone.trim()) leadData.phone = formData.phone.trim()
-      // Discord username is required if source is discord (validated above), include if provided
-      if (formData.discordUsername.trim()) {
-        leadData.discordUsername = formData.discordUsername.trim()
-      }
-      // if (formData.instagramUsername.trim()) leadData.instagramUsername = formData.instagramUsername.trim()
-      // if (formData.tiktokUsername.trim()) leadData.tiktokUsername = formData.tiktokUsername.trim()
-      if (formData.notes.trim()) leadData.notes = formData.notes.trim()
-      if (formData.estimatedValue.trim()) {
-        const value = parseFloat(formData.estimatedValue)
-        if (!isNaN(value)) leadData.estimatedValue = value
-      }
-
-      const newLead = await discordService.createLead(leadData)
+      // Static behavior - just simulate success
+      await new Promise((resolve) => setTimeout(resolve, 500))
       
       toast.success("Lead created successfully!")
-      router.push("/leads")
+      router.push(`/dashboard/${companyId}/leads${tokenQuery}`)
     } catch (error: any) {
       console.error("Error creating lead:", error)
       toast.error(error.message || "Failed to create lead")
@@ -116,11 +95,11 @@ export default function NewLeadPage() {
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+                <BreadcrumbLink href={`/dashboard/${companyId}${tokenQuery}`}>Dashboard</BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbLink href="/leads">Leads</BreadcrumbLink>
+                <BreadcrumbLink href={`/dashboard/${companyId}/leads${tokenQuery}`}>Leads</BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
@@ -224,11 +203,8 @@ export default function NewLeadPage() {
                       </SelectTrigger>
                       <SelectContent className="bg-white dark:bg-gray-900">
                         <SelectItem value="manual">Manual</SelectItem>
-                        <SelectItem value="discord">Discord</SelectItem>
-                        {/* <SelectItem value="instagram">Instagram</SelectItem> */}
-                        {/* <SelectItem value="tiktok">TikTok</SelectItem> */}
-                        {/* <SelectItem value="whop">Whop</SelectItem> */}
-                        {/* <SelectItem value="referral">Referral</SelectItem> */}
+                        <SelectItem value="referral">Referral</SelectItem>
+                        <SelectItem value="whop">Whop</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -254,55 +230,6 @@ export default function NewLeadPage() {
                       </SelectContent>
                     </Select>
                   </div>
-                </div>
-              </div>
-
-              {/* Social Media Usernames */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Social Media</h3>
-                
-                <div className="grid gap-4 md:grid-cols-1">
-                  <div className="space-y-2">
-                    <label htmlFor="discordUsername" className="text-sm font-medium text-gray-900 dark:text-white">
-                      Discord Username
-                      {formData.source === "discord" ? (
-                        <span className="text-red-500"> *</span>
-                      ) : (
-                        <span className="text-gray-600 dark:text-gray-400"> (optional)</span>
-                      )}
-                    </label>
-                    <Input
-                      id="discordUsername"
-                      value={formData.discordUsername}
-                      onChange={(e) => handleChange("discordUsername", e.target.value)}
-                      placeholder="username#1234"
-                      required={formData.source === "discord"}
-                    />
-                  </div>
-
-                  {/* <div className="space-y-2">
-                    <label htmlFor="instagramUsername" className="text-sm font-medium">
-                      Instagram Username
-                    </label>
-                    <Input
-                      id="instagramUsername"
-                      value={formData.instagramUsername}
-                      onChange={(e) => handleChange("instagramUsername", e.target.value)}
-                      placeholder="@username"
-                    />
-                  </div> */}
-
-                  {/* <div className="space-y-2">
-                    <label htmlFor="tiktokUsername" className="text-sm font-medium">
-                      TikTok Username
-                    </label>
-                    <Input
-                      id="tiktokUsername"
-                      value={formData.tiktokUsername}
-                      onChange={(e) => handleChange("tiktokUsername", e.target.value)}
-                      placeholder="@username"
-                    />
-                  </div> */}
                 </div>
               </div>
 
@@ -361,4 +288,3 @@ export default function NewLeadPage() {
     </div>
   )
 }
-
