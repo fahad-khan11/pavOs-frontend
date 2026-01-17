@@ -1,11 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit"
+import whopReducer from "./whopSlice"
 
 export const store = configureStore({
   reducer: {
-    // user: userReducer,
+    whop: whopReducer,
   },
 })
 
-// Types
 export type RootState = ReturnType<typeof store.getState>
 export type AppDispatch = typeof store.dispatch

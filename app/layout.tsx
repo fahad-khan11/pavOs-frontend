@@ -42,7 +42,9 @@ export default function RootLayout({
           <WhopApp accentColor="blue" appearance="inherit">
             <WhopThemeWrapper>
             <AuthProvider>
-          {children}
+              <Providers>
+                {children}
+              </Providers>
         </AuthProvider>
               {/* <AuthProvider> */}
                 {/* <div className="flex h-screen overflow-hidden">
