@@ -20,13 +20,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { useState } from "react"
 import { useAppSelector } from "@/lib/redux"
 
-const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Leads", href: "/leads", icon: MessageSquare },
-  { name: "Pipeline", href: "/pipeline", icon: Kanban },
-  // { name: "Contacts", href: "/contacts", icon: Users },
-  { name: "Analytics", href: "/analytics", icon: BarChart3 },
-]
+
 
 export function Navbar() {
   const pathname = usePathname()
@@ -41,6 +35,13 @@ export function Navbar() {
   const devToken = searchParams?.get("whop-dev-user-token")
   const tokenQuery = devToken ? `?whop-dev-user-token=${devToken}` : ""
 
+  const navigation = [
+    { name: "Dashboard", href: companyId ? `/dashboard/${companyId}${tokenQuery}` : "/dashboard", icon: LayoutDashboard },
+    { name: "Leads", href: companyId ? `/dashboard/${companyId}/leads${tokenQuery}` : "/leads", icon: MessageSquare },
+    { name: "Pipeline", href: companyId ? `/dashboard/${companyId}/pipeline${tokenQuery}` : "/pipeline", icon: Kanban },
+    { name: "Contacts", href: companyId ? `/dashboard/${companyId}/contacts${tokenQuery}` : "/contacts", icon: User },
+    { name: "Analytics", href: companyId ? `/dashboard/${companyId}/analytics${tokenQuery}` : "/analytics", icon: BarChart3 },
+  ]
 
   return (
     <nav className="border-b bg-white dark:bg-[#101828] shadow-md dark:shadow-none border-gray-200 dark:border-gray-800 relative z-10">
@@ -56,7 +57,7 @@ export function Navbar() {
                       <Menu className="h-6 w-6" />
                     </Button>
                   </SheetTrigger>
-                  <SheetContent side="left" className="bg-[#0e1d3a] border-r-gray-800 text-white p-0">
+                  <SheetContent side="left" className="!bg-[#0e1d3a] border-r-gray-800 text-white p-0">
                    <div className="p-6">
                       <div className="flex items-center gap-2 mb-8">
                         <div className="h-8 w-8 rounded-lg overflow-hidden">
@@ -73,7 +74,7 @@ export function Navbar() {
                       <div className="flex flex-col gap-2">
                         {navigation.map((item) => {
                           const Icon = item.icon
-                          const isActive = pathname === item.href
+                          const isActive = pathname === item.href || pathname?.startsWith(item.href + "/")
                           return (
                             <Link 
                               key={item.name} 
@@ -88,7 +89,7 @@ export function Navbar() {
                                 )}
                               >
                                 <Icon className="h-4 w-4" />
-                                {user?.name?.charAt(0).toUpperCase()}
+                                {item.name}
                               </Button>
                             </Link>
                           )
