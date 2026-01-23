@@ -5,7 +5,7 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Eye } from "lucide-react";
+import { Eye, ChevronLeft, ChevronRight } from "lucide-react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -49,7 +49,7 @@ export default function MembershipsPage() {
 
   // Redux
   const dispatch = useAppDispatch();
-  const { data: members, stats, isLoading, error } = useAppSelector((state) => state.members);
+  const { data: members, stats, isLoading, error, pageInfo } = useAppSelector((state) => state.members);
   const { isLoaded: isWhopLoaded } = useAppSelector((state) => state.whop);
 
   // Preserve the dev token in navigation links
@@ -58,7 +58,7 @@ export default function MembershipsPage() {
 
   useEffect(() => {
     if (isWhopLoaded) {
-      dispatch(fetchMembers());
+      dispatch(fetchMembers({}));
     }
   }, [dispatch, isWhopLoaded]);
 
@@ -84,6 +84,18 @@ export default function MembershipsPage() {
   const cancelledMembers = stats?.cancelled_members ?? members.filter(m => m.status === "cancelled").length;
   const draftedMembers = stats?.drafted_members ?? members.filter(m => m.status === "drafted").length;
   const totalRevenue = stats?.total_revenue_usd ?? members.reduce((sum, m) => sum + (m.total_spent_usd || 0), 0);
+  
+  const handlePreviousPage = () => {
+    if (pageInfo.has_previous_page && pageInfo.start_cursor) {
+      dispatch(fetchMembers({ cursor: pageInfo.start_cursor, direction: "prev" }));
+    }
+  };
+
+  const handleNextPage = () => {
+    if (pageInfo.has_next_page && pageInfo.end_cursor) {
+      dispatch(fetchMembers({ cursor: pageInfo.end_cursor, direction: "next" }));
+    }
+  };
 
   return (
     <div className="min-h-screen w-full bg-white dark:bg-gray-950 p-8">
@@ -253,6 +265,29 @@ export default function MembershipsPage() {
             </TableBody>
           </Table>
         </Card>
+        {/* Pagination Controls */}
+        <div className="flex items-center justify-end gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handlePreviousPage}
+              disabled={!pageInfo.has_previous_page || isLoading}
+              className="gap-1"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleNextPage}
+              disabled={!pageInfo.has_next_page || isLoading}
+              className="gap-1"
+            >
+              Next
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+        </div>
       </div>
     </div>
   );

@@ -1,8 +1,12 @@
+'use client'
 import { PricingCards } from "@/components/pricing-cards";
+import { useAppSelector } from "@/lib/redux";
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
+  const { user } = useAppSelector((state) => state.whop)
+  
   
   // Static dashboard data
   const stats = {
@@ -82,7 +86,7 @@ export default async function DashboardPage() {
             </nav>
             <div>
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                Welcome back, Creator
+                Welcome back, {user?.name}
               </h1>
               {/* <p className="text-gray-600 dark:text-gray-400 mt-1">
                 Here's what's happening with your partnerships today.

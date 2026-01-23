@@ -79,7 +79,10 @@ const initialState: MembersState = {
 
 export const fetchMembers = createAsyncThunk(
   "members/fetchMembers",
-  async (_, { getState, rejectWithValue }) => {
+  async (
+    pagination: { cursor?: string | null; direction?: "next" | "prev" } = {},
+    { getState, rejectWithValue }
+  ) => {
     try {
       const state = getState() as { whop: WhopState }
       const { company } = state.whop
@@ -88,15 +91,26 @@ export const fetchMembers = createAsyncThunk(
         return rejectWithValue("Missing company ID in Redux state")
       }
 
-      const response = await api.get("/api/v1/members", {
-        params: {
-          company_id: company.id
+      const params: any = {
+        company_id: company.id,
+        per_page: 10,
+      }
+
+      if (pagination.cursor) {
+        params.cursor = pagination.cursor
+        if (pagination.direction) {
+          params.direction = pagination.direction
         }
+      }
+
+      const response = await api.get("/api/v1/members", {
+        params,
       })
 
       return response.data
     } catch (error: any) {
-      const message = error.response?.data?.message || error.message || "An unknown error occurred"
+      const message =
+        error.response?.data?.message || error.message || "An unknown error occurred"
       return rejectWithValue(message)
     }
   }
