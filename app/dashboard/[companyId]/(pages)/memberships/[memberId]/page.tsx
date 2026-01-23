@@ -107,10 +107,10 @@ export default function MemberDetailPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
                 <div className="h-16 w-16 rounded-full bg-[#0e1d3a] dark:bg-[#F4C542] flex items-center justify-center shrink-0 text-xl font-bold text-white dark:text-gray-900">
-                    {member.name?.charAt(0) || "?"}
+                    {member.user?.name?.charAt(0) || "?"}
                 </div>
                 <div>
-                   <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{member.name || "N/A"}</h1>
+                   <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{member.user?.name || "N/A"}</h1>
                    <p className="text-gray-600 dark:text-gray-400 mt-1">
                       Member ID: {member.id || "N/A"}
                    </p>
@@ -141,12 +141,12 @@ export default function MemberDetailPage() {
                         <div className="flex items-center gap-2">
                             <Mail className="h-4 w-4 text-gray-500" />
                             <span className="font-medium">Email:</span>
-                            <span className="text-gray-600 dark:text-gray-400">{member.email || "N/A"}</span>
+                            <span className="text-gray-600 dark:text-gray-400">{member.user?.email || "N/A"}</span>
                         </div>
                         <div className="flex items-center gap-2">
                             <User className="h-4 w-4 text-gray-500" />
                             <span className="font-medium">Username:</span>
-                            <span className="text-gray-600 dark:text-gray-400">{member.username || "N/A"}</span>
+                            <span className="text-gray-600 dark:text-gray-400">{member.user?.username || "N/A"}</span>
                         </div>
                         <div className="flex items-center gap-2">
                             <Phone className="h-4 w-4 text-gray-500" />
@@ -176,7 +176,7 @@ export default function MemberDetailPage() {
                                 <DollarSign className="h-4 w-4 text-gray-500" />
                                 <span className="font-medium">Total Spent:</span>
                             </div>
-                            <span className="font-bold text-gray-900 dark:text-white">{formatCurrency(member.total_spent_usd)}</span>
+                            <span className="font-bold text-gray-900 dark:text-white">{formatCurrency(member.usd_total_spent)}</span>
                         </div>
                          <div className="flex items-center justify-between">
                              <div className="flex items-center gap-2">
