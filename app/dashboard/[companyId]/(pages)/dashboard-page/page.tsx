@@ -1,57 +1,9 @@
-import { headers } from "next/headers";
-import { whopsdk } from "@/lib/whop-sdk";
-import { WhopDataInitializer } from "@/components/whop-data-initializer";
 import { PricingCards } from "@/components/pricing-cards";
 
 export const dynamic = "force-dynamic";
 
-export default async function DashboardPage({
-  params,
-  searchParams,
-}: {
-  params: Promise<{ companyId: string }>;
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-}) {
-  const { companyId } = await params;
-  const sp = await searchParams;
-
-  const h = await headers();
-
-  // 1) Production / iframe: token comes in headers
-  const headerToken = h.get("x-whop-user-token");
-
-  // 2) Dev proxy: token is coming in query string
-  const devTokenRaw = sp["whop-dev-user-token"];
-  const devToken = Array.isArray(devTokenRaw) ? devTokenRaw[0] : devTokenRaw;
-
-  // Choose the token source
-  const token = headerToken || devToken;
-
-  if (!token) {
-    return (
-      <div style={{ padding: 24 }}>
-        <h2>Missing Whop token</h2>
-        <p>
-          Token not found in headers or query. Open through Whop iframe or dev
-          proxy.
-        </p>
-        <pre>{JSON.stringify({ headerKeys: [...h.keys()], searchParams: sp }, null, 2)}</pre>
-      </div>
-    );
-  }
-
-  // IMPORTANT: verifyUserToken expects headers. In dev, we manually provide the header.
-  const verifyHeaders = new Headers();
-  verifyHeaders.set("x-whop-user-token", token);
-
-  const { userId } = await whopsdk.verifyUserToken(verifyHeaders);
-   console.log('iggggg',userId); 
-  const [company, user, access] = await Promise.all([
-    whopsdk.companies.retrieve(companyId),
-    whopsdk.users.retrieve(userId),
-    whopsdk.users.checkAccess(companyId, { id: userId }),
-  ]);
-
+export default async function DashboardPage() {
+  
   // Static dashboard data
   const stats = {
     totalRevenue: 125000,
@@ -64,7 +16,12 @@ export default async function DashboardPage({
     closedDeals: 12,
   };
 
-
+  const activities = [
+    { _id: "1", type: "New Lead", description: "John Doe expressed interest in premium plan", createdAt: new Date(Date.now() - 30 * 60000).toISOString() },
+    { _id: "2", type: "Deal Won", description: "Closed partnership with Acme Corp", createdAt: new Date(Date.now() - 2 * 3600000).toISOString() },
+    { _id: "3", type: "Meeting Scheduled", description: "Demo call with TechStart Inc", createdAt: new Date(Date.now() - 5 * 3600000).toISOString() },
+    { _id: "4", type: "Proposal Sent", description: "Sent pricing proposal to GlobalTech", createdAt: new Date(Date.now() - 24 * 3600000).toISOString() },
+  ];
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -88,11 +45,35 @@ export default async function DashboardPage({
     return `${diffDays} days ago`;
   };
 
+  const statsData = [
+    {
+      title: "Total Revenue",
+      value: formatCurrency(stats.totalRevenue),
+      description: `From ${stats.wonLeads} won deals`,
+      icon: "💰",
+    },
+    {
+      title: "Win Rate",
+      value: `${stats.winRate}%`,
+      description: "Based on closed leads",
+      icon: "📈",
+    },
+    {
+      title: "Active Leads",
+      value: stats.activeDeals.toString(),
+      description: `${stats.totalLeads} total leads`,
+      icon: "👥",
+    },
+    {
+      title: "Avg Deal Size",
+      value: formatCurrency(stats.avgDealSize),
+      description: "Per won deal",
+      icon: "💼",
+    },
+  ];
+
   return (
     <>
-      {/* Initialize Redux store with Whop data */}
-      <WhopDataInitializer user={user as any} company={company as any} access={access as any} token={token} />
-      
       <div className="min-h-screen bg-white dark:bg-gray-950">
         <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-8 space-y-4">
@@ -101,7 +82,7 @@ export default async function DashboardPage({
             </nav>
             <div>
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                Welcome back, {(user as any)?.name || 'Creator'}
+                Welcome back, Creator
               </h1>
               {/* <p className="text-gray-600 dark:text-gray-400 mt-1">
                 Here's what's happening with your partnerships today.
@@ -110,7 +91,7 @@ export default async function DashboardPage({
           </div>
          
           {/* Stats Cards */}
-          {/* <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {statsData.map((stat) => (
               <div key={stat.title} className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6 shadow-sm">
                 <div className="flex items-center justify-between mb-2">
@@ -121,10 +102,10 @@ export default async function DashboardPage({
                 <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">{stat.description}</p>
               </div>
             ))}
-          </div> */}
+          </div>
 
           {/* Activity and Quick Stats */}
-          {/* <div className="grid gap-4 md:grid-cols-2 mt-8">
+          <div className="grid gap-4 md:grid-cols-2 mt-8">
             <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6 shadow-sm">
               <div className="mb-4">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Recent Activity</h3>
@@ -142,10 +123,10 @@ export default async function DashboardPage({
                   </div>
                 ))}
               </div>
-            </div> */}
+            </div>
 
             {/* Quick Stats */}
-            {/* <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6 shadow-sm">
+            <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6 shadow-sm">
               <div className="mb-4">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Quick Stats</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Overview of your pipeline</p>
@@ -174,10 +155,9 @@ export default async function DashboardPage({
                 </div>
               </div>
             </div>
-          </div> */}
+          </div>
 
           {/* Pricing Plans */}
-          <PricingCards />
         </main>
       </div>
     </>

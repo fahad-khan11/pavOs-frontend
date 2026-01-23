@@ -2,9 +2,12 @@ import { configureStore, combineReducers } from "@reduxjs/toolkit"
 import { persistStore, persistReducer } from "redux-persist"
 import storage from "redux-persist/lib/storage"
 import whopReducer from "./whopSlice"
+import membersReducer from "./membersSlice"
+import { setupAxiosInterceptors } from "@/lib/axios"
 
 const rootReducer = combineReducers({
   whop: whopReducer,
+  members: membersReducer,
 })
 
 const persistConfig = {
@@ -21,6 +24,9 @@ export const store = configureStore({
       serializableCheck: false,
     }),
 })
+
+// Setup Axios interceptors with the store
+setupAxiosInterceptors(store)
 
 export const persistor = persistStore(store)
 
