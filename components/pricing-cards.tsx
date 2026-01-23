@@ -24,10 +24,22 @@ const plans: PricingPlan[] = [
     ],
   },
   {
+    id: "basic",
+    name: "Basic",
+    price: 10,
+    popular: true,
+    features: [
+      { text: "Up to 50 leads", included: true },
+      { text: "Advanced analytics", included: true },
+      { text: "Priority support", included: true },
+      { text: "Up to 3 team members", included: true },
+      { text: "Integrations", included: false },
+    ],
+  },
+  {
     id: "premium",
     name: "Premium",
-    price: 5,
-    popular: true,
+    price: 20,
     features: [
       { text: "Unlimited leads", included: true },
       { text: "Advanced analytics", included: true },
@@ -51,9 +63,11 @@ export function PricingCards() {
 
   const handleSelectPlan = (planId: string) => {
     if (planId === "free") {
-      window.open("https://whop.com/api-app-mdb-iy-95-amk-4gc-l-free-access/", "_blank");
-    } else if (planId === "premium") {
-      window.open("https://whop.com/api-app-mdb-iy-95-amk-4gc-l-premuim-access/", "_blank");
+      // Navigate to dashboard view for current plan
+      router.push(`/dashboard/${companyId}/dashboard-page${tokenQuery}`);
+    } else {
+      // Navigate to checkout for upgrade
+      router.push(`/dashboard/${companyId}/checkout?plan=${planId}${tokenQueryAmp}`);
     }
   };
 
