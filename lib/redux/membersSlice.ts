@@ -93,7 +93,6 @@ export const fetchMembers = createAsyncThunk(
 
       const params: any = {
         company_id: company.id,
-        per_page: 10,
       }
 
       if (pagination.cursor) {
