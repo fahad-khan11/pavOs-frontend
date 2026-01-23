@@ -3,11 +3,13 @@ import { persistStore, persistReducer } from "redux-persist"
 import storage from "redux-persist/lib/storage"
 import whopReducer from "./whopSlice"
 import membersReducer from "./membersSlice"
+import paymentsReducer from "./paymentsSlice"
 import { setupAxiosInterceptors } from "@/lib/axios"
 
 const rootReducer = combineReducers({
   whop: whopReducer,
   members: membersReducer,
+  payments: paymentsReducer,
 })
 
 const persistConfig = {

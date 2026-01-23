@@ -23,7 +23,8 @@ import {
   Settings,
   User,
   Users,
-  LogOut
+  LogOut,
+  CreditCard
 } from "lucide-react"
 // import { useAuth } from "@/components/auth-provider"
 import {
@@ -59,7 +60,8 @@ export function Sidebar({ className }: SidebarProps) {
   const navigation = [
     { name: "Dashboard", href: companyId ? `/dashboard/${companyId}/dashboard-page${tokenQuery}` : "/dashboard", icon: LayoutDashboard },
     { name: "Members", href: companyId ? `/dashboard/${companyId}/memberships${tokenQuery}` : "/memberships", icon: Users },
-    { name: "Leads", href: companyId ? `/dashboard/${companyId}/leads${tokenQuery}` : "/leads", icon: MessageSquare },
+    // { name: "Leads", href: companyId ? `/dashboard/${companyId}/leads${tokenQuery}` : "/leads", icon: MessageSquare },
+    { name: "Payments", href: companyId ? `/dashboard/${companyId}/payments${tokenQuery}` : "/payments", icon: CreditCard },
     // { name: "Pipeline", href: companyId ? `/dashboard/${companyId}/pipeline${tokenQuery}` : "/pipeline", icon: Kanban },
     // { name: "Contacts", href: companyId ? `/dashboard/${companyId}/contacts${tokenQuery}` : "/contacts", icon: User },
     // { name: "Analytics", href: companyId ? `/dashboard/${companyId}/analytics${tokenQuery}` : "/analytics", icon: BarChart3 },

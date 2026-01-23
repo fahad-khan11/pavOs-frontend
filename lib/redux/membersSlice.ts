@@ -16,7 +16,7 @@ export interface MemberSummary {
 }
 
 // Type for Member Stats
-export interface MemberStats {
+export interface MemberStats { 
   total_members: number
   active_members: number
   cancelled_members: number
