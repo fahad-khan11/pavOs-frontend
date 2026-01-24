@@ -115,7 +115,7 @@ export default function MembershipsPage() {
           </Breadcrumb> */}
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Member</h1>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Members</h1>
               <p className="text-gray-600 dark:text-gray-400 mt-1">
                 View and manage your current members.
               </p>
