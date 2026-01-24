@@ -70,6 +70,8 @@ export function PricingCardsEmbedded() {
   const user = useAppSelector((state) => state.whop.user);
   const companyId = company?.id || "";
 
+
+
   // Preserve the dev token in navigation links
   const searchParams =
     typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
@@ -112,10 +114,10 @@ export function PricingCardsEmbedded() {
           company_id: companyId,
         },
       });
-
       setCheckoutSessionId(response.session_id);
       toast.success("Checkout session created!");
     } catch (error: any) {
+      console.log("Company ID:...........", companyId)
       console.error("Error creating checkout:", error);
       toast.error(error.response?.data?.error || "Failed to create checkout session");
       setIsLoading(false);
