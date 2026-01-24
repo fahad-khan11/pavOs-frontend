@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useParams, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -14,7 +15,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hook";
 import { fetchMemberDetails, clearSelectedMember } from "@/lib/redux/membersSlice";
-import { User, DollarSign, Calendar, Shield, Activity, Phone, Mail, Building } from "lucide-react";
+import { User, DollarSign, Calendar, Shield, Activity, Phone, Mail, Building, ArrowLeft } from "lucide-react";
 
 export default function MemberDetailPage() {
   const params = useParams();
@@ -86,6 +87,15 @@ export default function MemberDetailPage() {
     <div className="min-h-screen w-full bg-white dark:bg-gray-950 p-8">
       <div className="container mx-auto py-8 space-y-8">
         
+        {/* Back Button */}
+        <Link 
+          href={`/dashboard/${companyId}/memberships${tokenQuery}`}
+          className="inline-flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          <span>Back to Members</span>
+        </Link>
+
         {/* Header & Breadcrumb */}
         <div className="space-y-4">
           {/* <Breadcrumb>
