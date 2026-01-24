@@ -60,8 +60,7 @@ export function PricingCards() {
 
   const handleSelectPlan = (planId: string) => {
     if (!companyId) {
-      // If companyId isn't ready yet, don't start checkout
-      // (optional: show toast)
+     
       return;
     }
 
@@ -71,8 +70,8 @@ export function PricingCards() {
 
     const checkoutBaseUrl =
       planId === "free"
-        ? "https://whop.com/api-app-mdb-iy-95-amk-4gc-l-free-access/"
-        : "https://whop.com/api-app-mdb-iy-95-amk-4gc-l-premium-access/";
+        ? "https://whop.com/checkout/plan_lJBMufbqd2bR0"
+        : "https://whop.com/checkout/plan_sJZi0nuTnzXBf";
 
     // Add redirect back to your app after payment
     const checkoutUrl = `${checkoutBaseUrl}?redirect_url=${encodeURIComponent(redirectUrl)}`;

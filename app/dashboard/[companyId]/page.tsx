@@ -1,7 +1,7 @@
 import { headers } from "next/headers";
 import { whopsdk } from "@/lib/whop-sdk";
 import { WhopDataInitializer } from "@/components/whop-data-initializer";
-import { PricingCards } from "@/components/pricing-cards";
+import { PricingCardsEmbedded } from "@/components/pricing-cards-embedded";
 
 export const dynamic = "force-dynamic";
 
@@ -177,7 +177,7 @@ export default async function DashboardPage({
           </div> */}
 
           {/* Pricing Plans */}
-          <PricingCards />
+          <PricingCardsEmbedded />
         </main>
       </div>
     </>

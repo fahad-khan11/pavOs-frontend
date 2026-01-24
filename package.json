@@ -42,6 +42,7 @@
     "@reduxjs/toolkit": "^2.11.2",
     "@vercel/analytics": "latest",
     "@vercel/functions": "^3.1.4",
+    "@whop/checkout": "^0.0.50",
     "@whop/iframe": "^0.0.5",
     "@whop/react": "^0.3.0",
     "@whop/sdk": "^0.0.23",
