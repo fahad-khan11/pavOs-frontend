@@ -85,7 +85,7 @@ export function PricingCardsEmbedded() {
       return;
     }
 
-    // For free plan, just navigate to dashboard
+    // For free plan, just navigate 
     if (plan.id === "free" || plan.price === 0) {
       toast.success("Free access granted!");
       router.push(postCheckoutPath);
