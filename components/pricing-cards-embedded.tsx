@@ -96,7 +96,6 @@ export function PricingCardsEmbedded() {
     setSelectedPlan(plan);
 
     try {
-      // Create checkout configuration (Option 2: Embedded Checkout)
       const response = await checkoutApi.createCheckout({
         plan_type: plan.planType,
         initial_price: plan.planType === "renewal" ? 0 : plan.price,
