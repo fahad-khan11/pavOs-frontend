@@ -82,6 +82,8 @@ export function PricingCardsEmbedded() {
   const postCheckoutPath = `/dashboard/${companyId}/dashboard-page${tokenQuery}`;
 
   const handleSelectPlan = async (plan: PricingPlan) => {
+    console.log("🔍 Company ID:", companyId);
+    
     if (!companyId) {
       toast.error("Company ID not found. Please refresh the page.");
       return;
