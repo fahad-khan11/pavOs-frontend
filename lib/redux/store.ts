@@ -1,10 +1,32 @@
 import { configureStore, combineReducers } from "@reduxjs/toolkit"
-import { persistStore, persistReducer } from "redux-persist"
-import storage from "redux-persist/lib/storage"
+import { persistStore, persistReducer, WebStorage } from "redux-persist"
+import createWebStorage from "redux-persist/lib/storage/createWebStorage"
 import whopReducer from "./whopSlice"
 import membersReducer from "./membersSlice"
 import paymentsReducer from "./paymentsSlice"
 import { setupAxiosInterceptors } from "@/lib/axios"
+
+const createPersistStorage = (): WebStorage => {
+  const isServer = typeof window === "undefined";
+  
+  if (isServer) {
+    return {
+      getItem() {
+        return Promise.resolve(null);
+      },
+      setItem() {
+        return Promise.resolve();
+      },
+      removeItem() {
+        return Promise.resolve();
+      },
+    };
+  }
+  
+  return createWebStorage("local");
+};
+
+const storage = createPersistStorage();
 
 const rootReducer = combineReducers({
   whop: whopReducer,
@@ -15,6 +37,7 @@ const rootReducer = combineReducers({
 const persistConfig = {
   key: "root",
   storage,
+  whitelist: ['whop'], // Only persist whop state
 }
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)
