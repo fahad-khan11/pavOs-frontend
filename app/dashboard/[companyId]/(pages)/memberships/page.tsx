@@ -102,7 +102,7 @@ export default function MembershipsPage() {
       <div className="container mx-auto py-8 space-y-8">
         {/* Header */}
         <div className="space-y-4">
-          <Breadcrumb>
+          {/* <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
                 <BreadcrumbLink href={`/dashboard/${companyId}/dashboard-page${tokenQuery}`}>Dashboard</BreadcrumbLink>
@@ -112,12 +112,12 @@ export default function MembershipsPage() {
                 <BreadcrumbPage>Memberships</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
-          </Breadcrumb>
+          </Breadcrumb> */}
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Memberships</h1>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Member</h1>
               <p className="text-gray-600 dark:text-gray-400 mt-1">
-                View and manage your current plan memberships.
+                View and manage your current members.
               </p>
             </div>
           </div>

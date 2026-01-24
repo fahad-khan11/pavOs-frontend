@@ -88,7 +88,7 @@ export default function MemberDetailPage() {
         
         {/* Header & Breadcrumb */}
         <div className="space-y-4">
-          <Breadcrumb>
+          {/* <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
                 <BreadcrumbLink href={`/dashboard/${companyId}/dashboard-page${tokenQuery}`}>Dashboard</BreadcrumbLink>
@@ -102,7 +102,7 @@ export default function MemberDetailPage() {
                 <BreadcrumbPage>Member Details</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
-          </Breadcrumb>
+          </Breadcrumb> */}
           
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">

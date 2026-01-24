@@ -25,7 +25,7 @@ export default function ProfilePage() {
       <main className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         {/* Header */}
         <div className="space-y-4">
-          <Breadcrumb>
+          {/* <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
                 <BreadcrumbLink href={`/dashboard/${companyId}${tokenQuery}`} className="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">Dashboard</BreadcrumbLink>
@@ -35,7 +35,7 @@ export default function ProfilePage() {
                 <BreadcrumbPage className="font-semibold text-gray-900 dark:text-white">Profile</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
-          </Breadcrumb>
+          </Breadcrumb> */}
           <div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Profile Settings</h1>
             <p className="text-gray-500 dark:text-gray-400 mt-1">

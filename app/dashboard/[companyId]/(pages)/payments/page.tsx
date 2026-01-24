@@ -88,7 +88,7 @@ export default function PaymentsPage() {
         {/* Header */}
         <div className="mb-8 space-y-4">
           <nav className="text-sm text-gray-500 dark:text-gray-400">
-            Dashboard / Payments
+           Payments
           </nav>
           <div className="flex items-center gap-3">
             <CreditCard className="h-8 w-8 text-[#0e1d3a] dark:text-[#F4C542]" />
@@ -96,9 +96,9 @@ export default function PaymentsPage() {
               Payments
             </h1>
           </div>
-          <p className="text-gray-600 dark:text-gray-400">
+          {/* <p className="text-gray-600 dark:text-gray-400">
             View and manage all payment transactions
-          </p>
+          </p> */}
         </div>
 
         {/* Payments Table */}

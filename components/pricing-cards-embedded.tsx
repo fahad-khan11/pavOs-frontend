@@ -23,11 +23,11 @@ const plans: PricingPlan[] = [
     price: 0,
     planType: "one_time",
     features: [
-      { text: "Up to 5 leads", included: true },
-      { text: "Basic analytics", included: true },
-      { text: "Email support", included: true },
-      { text: "Team members", included: false },
-      { text: "Integrations", included: false },
+      { text: "Sync members", included: true },
+      { text: "See payments", included: true },
+    //   { text: "Email support", included: true },
+    //   { text: "Team members", included: false },
+    //   { text: "Integrations", included: false },
     ],
   },
   // {
@@ -79,7 +79,7 @@ export function PricingCardsEmbedded() {
   const tokenQuery = devToken ? `?whop-dev-user-token=${devToken}` : "";
 
   // This is the route you want AFTER checkout
-  const postCheckoutPath = `/dashboard/${companyId}/dashboard-page${tokenQuery}`;
+  const postCheckoutPath = `/dashboard/${companyId}/memberships${tokenQuery}`;
 
   const handleSelectPlan = async (plan: PricingPlan) => {
     console.log("🔍 Company ID:", companyId);
