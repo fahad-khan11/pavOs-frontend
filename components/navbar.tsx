@@ -13,7 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-// import { useAuth } from "@/components/auth-provider"
+// import { useAuth } from "@/components/auth-provider ........"
 import { useRouter } from "next/navigation"
 import { LayoutDashboard, Users, Kanban, BarChart3, User, Settings, MessageSquare, Menu ,  CreditCard} from "lucide-react"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
