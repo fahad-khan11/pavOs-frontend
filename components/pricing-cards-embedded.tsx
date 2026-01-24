@@ -44,6 +44,19 @@ const plans: PricingPlan[] = [
       { text: "All integrations", included: true },
     ],
   },
+  {
+    id: "pro",
+    name: "Pro",
+    price: 10,
+    planType: "renewal",
+    features: [
+      { text: "Everything in Premium", included: true },
+      { text: "Custom integrations", included: true },
+      { text: "Dedicated account manager", included: true },
+      { text: "SLA guarantee", included: true },
+      { text: "Advanced security", included: true },
+    ],
+  },
 ];
 
 export function PricingCardsEmbedded() {
@@ -86,9 +99,11 @@ export function PricingCardsEmbedded() {
       // Create checkout configuration (Option 2: Embedded Checkout)
       const response = await checkoutApi.createCheckout({
         plan_type: plan.planType,
-        initial_price: plan.price,
+        initial_price: plan.planType === "renewal" ? 0 : plan.price,
         renewal_price: plan.planType === "renewal" ? plan.price : undefined,
-        product_id: plan.planType === "renewal" ? "prod_gF4cmotTFroNy" : undefined,
+        product_id: plan.planType === "renewal" 
+          ? (plan.id === "pro" ? "prod_FJrlaJOQ8G6Ec" : "prod_gF4cmotTFroNy")
+          : undefined,
         billing_period: plan.planType === "renewal" ? 30 : undefined, 
         currency: "usd",
         metadata: {

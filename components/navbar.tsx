@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 // import { useAuth } from "@/components/auth-provider"
 import { useRouter } from "next/navigation"
-import { LayoutDashboard, Users, Kanban, BarChart3, User, Settings, MessageSquare, Menu } from "lucide-react"
+import { LayoutDashboard, Users, Kanban, BarChart3, User, Settings, MessageSquare, Menu ,  CreditCard} from "lucide-react"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { useState } from "react"
 import { useAppSelector } from "@/lib/redux"
@@ -38,7 +38,9 @@ export function Navbar() {
   const navigation = [
     { name: "Dashboard", href: companyId ? `/dashboard/${companyId}/dashboard-page${tokenQuery}` : "/dashboard", icon: LayoutDashboard },
     { name: "Members", href: companyId ? `/dashboard/${companyId}/memberships${tokenQuery}` : "/memberships", icon: Users },
-    { name: "Leads", href: companyId ? `/dashboard/${companyId}/leads${tokenQuery}` : "/leads", icon: MessageSquare },
+    { name: "Payments", href: companyId ? `/dashboard/${companyId}/payments${tokenQuery}` : "/payments", icon: CreditCard },
+
+    // { name: "Leads", href: companyId ? `/dashboard/${companyId}/leads${tokenQuery}` : "/leads", icon: MessageSquare },
     // { name: "Pipeline", href: companyId ? `/dashboard/${companyId}/pipeline${tokenQuery}` : "/pipeline", icon: Kanban },
     // { name: "Contacts", href: companyId ? `/dashboard/${companyId}/contacts${tokenQuery}` : "/contacts", icon: User },
     // { name: "Analytics", href: companyId ? `/dashboard/${companyId}/analytics${tokenQuery}` : "/analytics", icon: BarChart3 },

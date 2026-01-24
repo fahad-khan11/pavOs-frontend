@@ -96,9 +96,7 @@ export default async function DashboardPage({
       <div className="min-h-screen bg-white dark:bg-gray-950">
         <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-8 space-y-4">
-            <nav className="text-sm text-gray-500 dark:text-gray-400">
-              Dashboard
-            </nav>
+           
             <div>
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
                 Welcome back, {(user as any)?.name || 'Creator'}
@@ -145,7 +143,7 @@ export default async function DashboardPage({
             </div> */}
 
             {/* Quick Stats */}
-            {/* <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6 shadow-sm">
+            {/* <div className="bg-white dark:bg-gray-900 rounded-lg @border border-gray-200 dark:border-gray-800 p-6 shadow-sm">
               <div className="mb-4">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Quick Stats</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Overview of your pipeline</p>
