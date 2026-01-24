@@ -203,9 +203,9 @@ export function PricingCardsEmbedded() {
     <div className="mt-8">
       <div className="mb-4">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Choose Your Plan</h2>
-        <p className="text-gray-600 dark:text-gray-400 mt-1">
+        {/* <p className="text-gray-600 dark:text-gray-400 mt-1">
           Select the plan that best fits your needs
-        </p>
+        </p> */}
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">
