@@ -58,7 +58,7 @@ export function Sidebar({ className }: SidebarProps) {
   const tokenQuery = devToken ? `?whop-dev-user-token=${devToken}` : ""
 
   const navigation = [
-    { name: "Dashboard", href: companyId ? `/dashboard/${companyId}/dashboard-page${tokenQuery}` : "/dashboard", icon: LayoutDashboard },
+    // { name: "Dashboard", href: companyId ? `/dashboard/${companyId}/dashboard-page${tokenQuery}` : "/dashboard", icon: LayoutDashboard },
     { name: "Members", href: companyId ? `/dashboard/${companyId}/memberships${tokenQuery}` : "/memberships", icon: Users },
     // { name: "Leads", href: companyId ? `/dashboard/${companyId}/leads${tokenQuery}` : "/leads", icon: MessageSquare },
     { name: "Payments", href: companyId ? `/dashboard/${companyId}/payments${tokenQuery}` : "/payments", icon: CreditCard },
